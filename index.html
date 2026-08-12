@@ -427,9 +427,9 @@
                     <div>
                         <label class="block text-[11px] font-bold text-muted mb-1">付款方式</label>
                         <select id="exp-method" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-[#059669]">
-                            <option value="現金">💵 現金</option>
-                            <option value="刷卡">💳 刷卡</option>
-                            <option value="交通卡">🚇 交通卡/T-Money</option>
+                            <option value="現金">現金</option>
+                            <option value="刷卡">刷卡</option>
+                            <option value="交通卡">交通卡/T-Money</option>
                         </select>
                     </div>
                 </div>
@@ -562,13 +562,13 @@
         let tripData = [
             { day: 1, items: [
                 { time: "19:45", name: "搭機抵達金浦機場 (IT662)", addr: "서울특별시 강서구 하늘길 112", transport: "台灣虎航 IT662，15:55 高雄小港機場起飛 → 19:45 抵達金浦機場" },
-                { time: "20:30", name: "飯店入住", addr: "서울 마포구 서강로13길 31-10", transport: "從京義線森林路弘益大學站6號出口步行約450公尺，約6分鐘" },
-                { time: "21:00", name: "晚餐：고기꾼김춘배 홍대숲길점", addr: "서울 마포구 서강로13길 31-2", transport: "육류,고기요리（肉類料理），營業至22:00（最後點餐）" }
+                { time: "住宿", name: "Dave's Home", addr: "서울 마포구 서강로13길 31-10", transport: "從京義線森林路弘益大學站6號出口步行約450公尺，約6分鐘" },
+                { time: "晚餐", name: "고기꾼김춘배 홍대숲길점", addr: "서울 마포구 서강로13길 31-2", transport: "육류,고기요리（肉類料理），營業至22:00（最後點餐）" }
             ]},
             { day: 2, items: [
-                { time: "", name: "大創明洞總店 (Daiso Myeongdong Main)", addr: "서울 중구 명동길 43", transport: "從這裡作為起點，可盡情逛這間樓層眾多的總店，鄰近明洞主街，前往下一站方便。\n營業時間：每日 10:00–22:00" },
-                { time: "", name: "GANA OPTICAL", addr: "서울 중구 충무로2가 12-17", transport: "從大創明洞總店步行約5-8分鐘即可抵達，位於忠武路方向，適合逛完街後處理眼鏡相關需求。\n營業時間：每日 09:00–22:00" },
-                { time: "", name: "新世界百貨總店 (Shinsegae Department Store Main)", addr: "서울 중구 소공로 63", transport: "從眼鏡行步行前往，距離適中，百貨周邊建築燈光設計著名，適合作為行程最後一站悠閒逛逛。\n營業時間：週一至週四 10:30–20:00，週五至週日 10:30–20:30" }
+                { time: "明洞", name: "大創明洞總店 (Daiso Myeongdong Main)", addr: "서울 중구 명동길 43", transport: "從這裡作為起點，可盡情逛這間樓層眾多的總店，鄰近明洞主街，前往下一站方便。\n營業時間：每日 10:00–22:00" },
+                { time: "明洞", name: "GANA OPTICAL", addr: "서울 중구 충무로2가 12-17", transport: "從大創明洞總店步行約5-8分鐘即可抵達，位於忠武路方向，適合逛完街後處理眼鏡相關需求。\n營業時間：每日 09:00–22:00" },
+                { time: "明洞", name: "新世界百貨總店 (Shinsegae Department Store Main)", addr: "서울 중구 소공로 63", transport: "從眼鏡行步行前往，距離適中，百貨周邊建築燈光設計著名，適合作為行程最後一站悠閒逛逛。\n營業時間：週一至週四 10:30–20:00，週五至週日 10:30–20:30" }
             ]},
             { day: 3, items: [
                 { time: "20:35", name: "搭機返回高雄 (IT663)", addr: "서울특별시 강서구 하늘길 112", transport: "台灣虎航 IT663，20:35 金浦機場起飛 → 22:40 抵達高雄小港機場" }
@@ -576,7 +576,7 @@
         ];
 
         let buyData = [
-            { region: "弘大・麻浦區 (Hongdae / Mapo)", tag: "美食", desc: "此區適合安排在同一天的熱鬧行程，充滿年輕活力與韓式炭烤風情。", items: [
+            { region: "弘大・麻浦區", tag: "美食", desc: "此區適合安排在同一天的熱鬧行程，充滿年輕活力與韓式炭烤風情。", items: [
                 { name: "Piggy Bank", note: "4.0・₩20,000-₩30,000｜弘大必吃石頭烤肉。", pill: "美食" },
                 { name: "朝鮮火爐", note: "4.6・₩20,000-₩60,000｜隱藏版高水準韓牛。", pill: "美食" },
                 { name: "옥동식 (Okdongsik)", note: "精緻豬肉湯飯。", pill: "美食" },
@@ -584,7 +584,7 @@
                 { name: "春川家辣炒雞排", note: "新村人氣名店。", pill: "美食" },
                 { name: "大韓牛腸", note: "韓式烤腸愛好者必訪。", pill: "美食" }
             ]},
-            { region: "乙支路・明洞・鐘路 (Euljiro / Myeongdong / Jongno)", tag: "美食", desc: "這一帶是首爾最經典的舊城區，適合體驗歷史悠久的老店。", items: [
+            { region: "乙支路・明洞・鐘路", tag: "美食", desc: "這一帶是首爾最經典的舊城區，適合體驗歷史悠久的老店。", items: [
                 { name: "山淸炭火花園", note: "4.2・₩20,000-₩60,000｜乙支路排隊名店，炭香極佳。", pill: "美食" },
                 { name: "河東館", note: "鐘路 80 年歷史牛肉湯。", pill: "美食" },
                 { name: "王妃家", note: "明洞知名的燒肉。", pill: "美食" },
@@ -593,20 +593,20 @@
                 { name: "滿足五香豬腳", note: "位於東大門附近，適合逛完東大門前往。", pill: "美食" },
                 { name: "孫家一隻雞", note: "東廟站經典雞肉湯品。", pill: "美食" }
             ]},
-            { region: "北村・景福宮・安國 (Bukchon / Gyeongbokgung / Anguk)", tag: "美食", desc: "這區充滿傳統韓屋氣息，適合安排文青與歷史巡禮。", items: [
+            { region: "北村・景福宮・安國", tag: "美食", desc: "這區充滿傳統韓屋氣息，適合安排文青與歷史巡禮。", items: [
                 { name: "Muguok", note: "4.6・₩10,000-₩20,000｜精緻的北韓風味蔘雞湯。", pill: "美食" },
                 { name: "Tosokchon Samgyetang", note: "4.2・₩20,000-₩30,000｜景福宮旁排隊名店。", pill: "美食" },
                 { name: "三清洞手製麵疙瘩", note: "北村在地人排隊美食。", pill: "美食" },
                 { name: "百年土種蔘雞湯", note: "北村老字號。", pill: "美食" },
                 { name: "大瓦房醬蟹", note: "米其林推薦的頂級醬蟹。", pill: "美食" }
             ]},
-            { region: "聖水洞・漢南洞 (Seongsu / Hannam)", tag: "美食", desc: "首爾目前最紅的潮流區，適合文青拍照與精緻餐飲。", items: [
+            { region: "聖水洞・漢南洞", tag: "美食", desc: "首爾目前最紅的潮流區，適合文青拍照與精緻餐飲。", items: [
                 { name: "安木 聖水", note: "4.7・₩10,000-₩20,000｜米其林推薦的人氣湯飯。", pill: "美食" },
                 { name: "Cafe Onion 聖水店", note: "廢墟工業風麵包店。", pill: "美食" },
                 { name: "松林馬鈴薯湯", note: "聖水站的口碑名店。", pill: "美食" },
                 { name: "SOLSOT 牛肉釜飯", note: "漢南洞年輕人最愛。", pill: "美食" }
             ]},
-            { region: "新沙・江南 (Sinsa / Gangnam)", tag: "美食", desc: "這區是精緻甜點與熱門深夜食堂的聚集地。", items: [
+            { region: "新沙・江南", tag: "美食", desc: "這區是精緻甜點與熱門深夜食堂的聚集地。", items: [
                 { name: "Myeonseoul", note: "4.4・₩10,000-₩20,000｜黑白大廚主廚餐廳。", pill: "美食" },
                 { name: "NUDAKE", note: "新沙洞藝術級別甜點。", pill: "美食" },
                 { name: "漢信辣雞腳", note: "新沙洞宵夜首選。", pill: "美食" }
