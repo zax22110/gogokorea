@@ -272,6 +272,19 @@
                     </button>
                 </div>
             </div>
+
+            <!-- 資料更新卡片 -->
+            <div class="custom-card bg-surface p-4 space-y-3">
+                <div class="flex items-center space-x-2 text-accent">
+                    <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <h3 class="font-bold text-sm">資料更新</h3>
+                </div>
+                <p class="text-xs text-muted leading-relaxed">手帳內容更新後，因為資料會存在手機瀏覽器裡，單純重新整理不會自動套用最新版本。點下方按鈕可清除舊資料、重新載入最新內容（已勾選、手動修改過的內容會一併被清除）。</p>
+                <button onclick="resetAppData()" class="w-full py-2.5 border-2 border-dashed border-accent text-accent font-bold rounded-lg text-sm hover:bg-accent/5 transition flex items-center justify-center space-x-1">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span>重置為最新版本</span>
+                </button>
+            </div>
         </section>
 
     </main>
@@ -682,6 +695,15 @@
             } catch (error) {
                 console.error("載入資料錯誤", error);
             }
+        }
+
+        function resetAppData() {
+            showConfirm('確定要清除目前的資料，重新載入最新版本嗎？（已勾選、已手動修改過的內容會被清空）', () => {
+                ['seoul_trip', 'seoul_buy', 'seoul_shopping', 'seoul_prep', 'seoul_expense'].forEach(key => {
+                    try { localStorage.removeItem(key); } catch (error) { console.error('清除資料錯誤', error); }
+                });
+                location.reload();
+            });
         }
 
         // -------------------------
