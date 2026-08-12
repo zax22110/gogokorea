@@ -568,8 +568,45 @@
         let prepData = [];
         
         const defaultPrepList = [
-            { category: "隨身包", items: [{name: "護照", checked: false}, {name: "錢包", checked: false}, {name: "手機", checked: false}] },
-            { category: "生活用品", items: [{name: "化妝水", checked: false}, {name: "乳液", checked: false}] }
+            { category: "證件／重要資料", items: [
+                { name: "護照", checked: false },
+                { name: "機票／訂房資料", checked: false },
+                { name: "信用卡／現金", checked: false },
+                { name: "旅平險資料", checked: false },
+                { name: "證件影本／截圖備份", checked: false }
+            ]},
+            { category: "3C／網路用品", items: [
+                { name: "手機", checked: false },
+                { name: "行動電源", checked: false },
+                { name: "充電器／充電線", checked: false },
+                { name: "韓國兩圓孔轉接頭", checked: false },
+                { name: "eSIM／網卡資訊", checked: false },
+                { name: "相機／記憶卡（有需要再帶）", checked: false }
+            ]},
+            { category: "保養／彩妝", items: [
+                { name: "保濕保養品", checked: false },
+                { name: "防曬", checked: false },
+                { name: "卸妝／洗面乳", checked: false },
+                { name: "護唇膏", checked: false },
+                { name: "日常彩妝品", checked: false },
+                { name: "隱形眼鏡／藥水", checked: false }
+            ]},
+            { category: "衣物／穿搭", items: [
+                { name: "上衣／下身", checked: false },
+                { name: "內衣褲／襪子", checked: false },
+                { name: "外套", checked: false },
+                { name: "睡衣", checked: false },
+                { name: "好走的鞋子", checked: false },
+                { name: "包包／配件", checked: false }
+            ]},
+            { category: "常備用品／其他", items: [
+                { name: "腸胃藥／止痛藥", checked: false },
+                { name: "口罩／濕紙巾", checked: false },
+                { name: "雨傘", checked: false },
+                { name: "水壺／環保杯", checked: false },
+                { name: "購物袋", checked: false },
+                { name: "回程預留行李空間", checked: false }
+            ]}
         ];
 
         function saveData() {
