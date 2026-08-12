@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>首爾旅遊手帳</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F5D64B;
+            --surface: #FFFFFF;
+            --maroon: #4A1C2E;
+            --accent: #CE3843;
+            --blue: #29A9E0;
+            --orange: #EE6A43;
+            --ink: #331520;
+            --muted: #8E8894;
+            --line: #ECE8EA;
+            --soft: #FBEFA8;
+            --emerald: #059669; /* 記帳專屬顏色 */
+            --naver: #03C75A; /* NAVER 綠色 */
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg);
+            color: var(--ink);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .text-surface { color: var(--surface); }
+        .text-maroon { color: var(--maroon); }
+        .text-accent { color: var(--accent); }
+        .text-blue { color: var(--blue); }
+        .text-orange { color: var(--orange); }
+        .text-ink { color: var(--ink); }
+        .text-muted { color: var(--muted); }
+        
+        .bg-maroon { background-color: var(--maroon); }
+        .bg-accent { background-color: var(--accent); }
+        .bg-blue { background-color: var(--blue); }
+        .bg-orange { background-color: var(--orange); }
+        .bg-surface { background-color: var(--surface); }
+        .bg-line { background-color: var(--line); }
+        .bg-soft { background-color: var(--soft); }
+        .bg-bg { background-color: var(--bg); }
+        
+        .border-maroon { border-color: var(--maroon); }
+        .border-accent { border-color: var(--accent); }
+        .border-blue { border-color: var(--blue); }
+        .border-orange { border-color: var(--orange); }
+        .border-line { border-color: var(--line); }
+        .border-bg { border-color: var(--bg); }
+        
+        .custom-card {
+            border: 1.5px solid var(--maroon);
+            border-radius: 16px;
+            box-shadow: 0 4px 0 rgba(74, 28, 46, 0.1);
+        }
+        
+        /* 隱藏捲軸但可滾動 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 按鈕點擊特效 */
+        .active\:scale-98:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden pb-[70px]">
+
+    <!-- Top Header -->
+    <header class="bg-surface border-b-2 border-maroon px-4 py-3 shrink-0 z-10 relative shadow-sm">
+        <h1 class="text-xl font-bold text-maroon text-center tracking-wide">首爾旅遊手帳</h1>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-6 relative" id="main-content">
+        
+        <!-- Tab 1: 行程 -->
+        <section id="tab-trip" class="tab-content hidden space-y-4">
+            <div class="custom-card bg-maroon text-surface p-4 flex items-center space-x-3 mb-2">
+                <svg class="w-8 h-8 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <div>
+                    <h2 class="font-bold text-lg">行程規劃</h2>
+                    <p class="text-xs opacity-90">跟著地圖走，不迷路</p>
+                </div>
+            </div>
+            
+            <div id="itinerary-list" class="space-y-6">
+                <!-- 行程資料由 JS 生成 -->
+            </div>
+        </section>
+
+        <!-- Tab 2: 必買必吃推薦 -->
+        <section id="tab-buy" class="tab-content hidden space-y-4">
+            <div class="custom-card bg-accent text-surface p-4 flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-8 h-8 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                    <div>
+                        <h2 class="font-bold text-lg">必買必吃推薦</h2>
+                        <p class="text-xs opacity-90">精選好物與美食清單</p>
+                    </div>
+                </div>
+                <button onclick="addBuyRegion()" class="w-8 h-8 shrink-0 flex items-center justify-center rounded-full border-2 border-dashed border-surface text-surface hover:bg-surface/10 transition" title="新增推薦區域">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                </button>
+            </div>
+
+            <div id="buy-list" class="space-y-3">
+                <!-- 必買必吃資料由 JS 生成 -->
+            </div>
+        </section>
+
+        <!-- Tab 3: 清單 (購物清單 + 行前準備) -->
+        <section id="tab-list" class="tab-content hidden space-y-6">
+            <div class="custom-card bg-blue text-surface p-4 flex items-center space-x-3 mb-2">
+                <svg class="w-8 h-8 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                <div>
+                    <h2 class="font-bold text-lg">我的清單</h2>
+                    <p class="text-xs opacity-90">購物與行前準備，勾選完成</p>
+                </div>
+            </div>
+
+            <!-- 區塊 1: 購物清單 -->
+            <div class="custom-card bg-surface p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-blue stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        <h3 class="font-bold text-base text-maroon">購物清單</h3>
+                    </div>
+                    <button onclick="openShoppingModal()" class="w-7 h-7 shrink-0 flex items-center justify-center rounded-full border-2 border-dashed border-blue text-blue hover:bg-blue/5 transition" title="新增商品">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                    </button>
+                </div>
+
+                <div id="shopping-list">
+                    <!-- 購物清單由 JS 生成 -->
+                </div>
+            </div>
+
+            <!-- 區塊 2: 行前準備 -->
+            <div class="space-y-3 pt-2">
+                <div class="flex items-center justify-between border-b border-maroon/20 pb-2">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-orange stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h3 class="font-bold text-base text-maroon">行前準備</h3>
+                    </div>
+                    <button onclick="openPrepModal()" class="w-7 h-7 shrink-0 flex items-center justify-center rounded-full border-2 border-dashed border-orange text-orange hover:bg-orange/5 transition" title="新增準備項目">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                    </button>
+                </div>
+
+                <div id="prep-list" class="space-y-3">
+                    <!-- 行前準備清單由 JS 生成 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: 記帳 -->
+        <section id="tab-expense" class="tab-content hidden space-y-4">
+            <div class="custom-card bg-[#059669] text-surface p-4 flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-8 h-8 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div>
+                        <h2 class="font-bold text-lg">記帳</h2>
+                        <p class="text-xs opacity-90">精準掌控花費</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 總計區塊 -->
+            <div class="custom-card bg-surface p-4 flex items-center justify-between">
+                <span class="text-sm font-bold text-muted">總花費估算</span>
+                <div class="flex items-center space-x-3">
+                    <div class="text-right">
+                        <span class="text-2xl font-bold text-[#059669]" id="expense-total">0</span>
+                        <span class="text-xs font-bold text-muted">TWD</span>
+                    </div>
+                    <button onclick="openExpenseModal()" class="w-8 h-8 shrink-0 flex items-center justify-center rounded-full border-2 border-dashed border-[#059669] text-[#059669] hover:bg-[#059669]/5 transition" title="新增一筆花費">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 記帳清單 -->
+            <div id="expense-list" class="space-y-2 mt-2">
+                <!-- 記帳資料由 JS 生成 -->
+            </div>
+        </section>
+
+        <!-- Tab 5: 工具 -->
+        <section id="tab-tools" class="tab-content hidden space-y-4">
+            <div class="custom-card bg-maroon text-surface p-4 flex items-center space-x-3 mb-2">
+                <svg class="w-8 h-8 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                <div>
+                    <h2 class="font-bold text-lg">實用工具</h2>
+                    <p class="text-xs opacity-90">天氣、匯率、分帳、翻譯</p>
+                </div>
+            </div>
+
+            <!-- 天氣卡片 -->
+            <div class="custom-card bg-surface p-4 space-y-3">
+                <div class="flex items-center space-x-2 text-blue">
+                    <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                    <h3 class="font-bold text-sm">首爾天氣預報</h3>
+                </div>
+                <div id="weather-content" class="text-center text-sm font-bold text-muted py-2">載入中...</div>
+            </div>
+
+            <!-- 匯率卡片 -->
+            <div class="custom-card bg-surface p-4 space-y-3">
+                <div class="flex items-center justify-between text-orange">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h3 class="font-bold text-sm">即時匯率換算</h3>
+                    </div>
+                    <span id="rate-status" class="text-[10px] bg-bg px-2 py-0.5 rounded text-muted">更新中</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-muted mb-1">韓元 KRW</label>
+                        <input type="number" id="calc-krw" class="w-full px-3 py-2 border border-line rounded-lg font-bold text-ink bg-bg/20 focus:outline-none focus:border-orange" placeholder="10000" oninput="convertCurrency('krw')">
+                    </div>
+                    <div class="pt-4 text-line">
+                        <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-muted mb-1">台幣 TWD</label>
+                        <input type="number" id="calc-twd" class="w-full px-3 py-2 border border-line rounded-lg font-bold text-ink bg-bg/20 focus:outline-none focus:border-orange" placeholder="" oninput="convertCurrency('twd')">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分帳卡片 -->
+            <div class="custom-card bg-surface p-4 space-y-3">
+                <div class="flex items-center space-x-2 text-maroon">
+                    <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <h3 class="font-bold text-sm">AA 分帳小幫手</h3>
+                </div>
+                <div class="flex items-end space-x-2">
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-muted mb-1">總金額</label>
+                        <input type="number" id="split-total" class="w-full px-3 py-2 border border-line rounded-lg font-bold text-sm bg-bg/10 focus:outline-none focus:border-maroon" placeholder="輸入總額" oninput="calculateSplit()">
+                    </div>
+                    <div class="w-20">
+                        <label class="block text-[10px] font-bold text-muted mb-1">人數</label>
+                        <input type="number" id="split-ppl" class="w-full px-3 py-2 border border-line rounded-lg font-bold text-sm text-center bg-bg/10 focus:outline-none focus:border-maroon" value="2" min="2" oninput="calculateSplit()">
+                    </div>
+                </div>
+                <div class="bg-soft rounded-lg p-3 text-center border border-maroon/10">
+                    <span class="text-xs font-bold text-maroon">每人應付</span>
+                    <div class="text-lg font-bold text-accent mt-1" id="split-result">0</div>
+                </div>
+            </div>
+
+            <!-- 翻譯卡片 -->
+            <div class="custom-card bg-surface p-4 space-y-3">
+                <div class="flex items-center space-x-2 text-ink">
+                    <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+                    <h3 class="font-bold text-sm">Google 翻譯捷徑</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openTranslate('ko-tw')" class="py-2.5 border-2 border-line rounded-lg font-bold text-sm text-ink hover:bg-bg/50 transition flex items-center justify-center space-x-1">
+                        <span>🇰🇷 韓 ➔ 中</span>
+                    </button>
+                    <button onclick="openTranslate('tw-ko')" class="py-2.5 border-2 border-line rounded-lg font-bold text-sm text-ink hover:bg-bg/50 transition flex items-center justify-center space-x-1">
+                        <span>🇹🇼 中 ➔ 韓</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-surface border-t-2 border-line px-1 py-2 flex justify-around items-center z-20 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('trip')" id="nav-trip" class="nav-btn flex flex-col items-center p-1 w-[18%] text-accent">
+            <svg class="w-6 h-6 stroke-current mb-1" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="text-[10px] font-bold">行程</span>
+        </button>
+        <button onclick="switchTab('buy')" id="nav-buy" class="nav-btn flex flex-col items-center p-1 w-[18%] text-muted hover:text-accent transition">
+            <svg class="w-6 h-6 stroke-current mb-1" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+            <span class="text-[10px] font-bold">必買必吃</span>
+        </button>
+        <button onclick="switchTab('list')" id="nav-list" class="nav-btn flex flex-col items-center p-1 w-[18%] text-muted hover:text-accent transition">
+            <svg class="w-6 h-6 stroke-current mb-1" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            <span class="text-[10px] font-bold">清單</span>
+        </button>
+        <button onclick="switchTab('expense')" id="nav-expense" class="nav-btn flex flex-col items-center p-1 w-[18%] text-muted hover:text-accent transition">
+            <svg class="w-6 h-6 stroke-current mb-1" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="text-[10px] font-bold">記帳</span>
+        </button>
+        <button onclick="switchTab('tools')" id="nav-tools" class="nav-btn flex flex-col items-center p-1 w-[18%] text-muted hover:text-accent transition">
+            <svg class="w-6 h-6 stroke-current mb-1" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+            <span class="text-[10px] font-bold">工具</span>
+        </button>
+    </nav>
+
+    <!-- Toast 通知 -->
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-ink text-surface px-4 py-2 rounded-full text-sm font-bold shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-50"></div>
+
+    <!-- Confirm 彈窗 -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-[60]">
+        <div class="custom-card bg-surface w-full max-w-xs p-6 space-y-4 text-center">
+            <h3 class="font-bold text-lg text-maroon" id="confirm-text">確認要刪除嗎？</h3>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeConfirm()" class="flex-1 py-2.5 bg-line text-ink font-bold rounded-xl text-sm">取消</button>
+                <button id="confirm-btn" class="flex-1 py-2.5 bg-accent text-white font-bold rounded-xl text-sm shadow">確定刪除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 圖片放大預覽 Modal -->
+    <div id="image-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-[60]" onclick="closeImageModal()">
+        <img id="modal-image" src="" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl object-contain">
+        <button class="absolute top-4 right-4 bg-white/20 p-2 rounded-full text-white hover:bg-white/40">
+            <svg class="w-6 h-6 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+
+    <!-- Modal for Shopping Add -->
+    <div id="shopping-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="custom-card bg-surface w-full max-w-sm p-5 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
+            <h3 class="font-bold text-base text-blue flex items-center space-x-1">
+                <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                <span>新增商品</span>
+            </h3>
+            <form onsubmit="addShoppingItem(event)" class="space-y-3">
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="text" id="shop-name" placeholder="商品名稱" required class="col-span-2 px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-blue">
+                    <input type="number" id="shop-qty" placeholder="數量" value="1" min="1" class="px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-blue">
+                </div>
+                <input type="text" id="shop-note" placeholder="備註 (例如：要買粉紅色)" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-blue">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[11px] font-bold text-muted mb-1">上傳商品圖片 (選填)</label>
+                        <input type="file" id="shop-img" accept="image/*" class="w-full text-xs text-muted border border-line rounded-lg p-1 bg-bg/10 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-muted mb-1">商品網址 / 連結 (選填)</label>
+                        <input type="url" id="shop-link" placeholder="https://..." class="w-full px-3 py-1.5 border border-line rounded-lg text-xs bg-bg/10 focus:outline-none focus:border-blue">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-muted mb-1 flex items-center space-x-1">
+                        <svg class="w-3.5 h-3.5 stroke-current text-accent" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                        <span>關聯行程地點 (讓商品也顯示在該行程中)</span>
+                    </label>
+                    <select id="shop-location-id" class="w-full px-3 py-2 border border-line rounded-lg text-xs bg-bg/10 focus:outline-none focus:border-blue">
+                        <option value="">不指定 (僅列在購物清單)</option>
+                    </select>
+                </div>
+
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeShoppingModal()" class="flex-1 py-2.5 bg-line text-ink font-bold rounded-lg text-sm">取消</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-blue text-white font-bold rounded-lg text-sm shadow hover:opacity-90 active:scale-98 transition flex items-center justify-center space-x-1">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                        <span>加入購物清單</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Prep Add -->
+    <div id="prep-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="custom-card bg-surface w-full max-w-sm p-5 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
+            <h3 class="font-bold text-base text-orange flex items-center space-x-1">
+                <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                <span>新增準備項目</span>
+            </h3>
+            <form onsubmit="addPrepItem(event)" class="space-y-3">
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="text" id="prep-category" placeholder="類別 (例: 隨身包)" required class="col-span-1 px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-orange">
+                    <input type="text" id="prep-name" placeholder="項目名稱 (例: 護照)" required class="col-span-2 px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-orange">
+                </div>
+
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closePrepModal()" class="flex-1 py-2.5 bg-line text-ink font-bold rounded-lg text-sm">取消</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-orange text-white font-bold rounded-lg text-sm shadow hover:opacity-90 active:scale-98 transition flex items-center justify-center space-x-1">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                        <span>加入行前準備</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Expense Add -->
+    <div id="expense-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="custom-card bg-surface w-full max-w-sm p-5 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
+            <h3 class="font-bold text-base text-[#059669] flex items-center space-x-1">
+                <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                <span>新增一筆花費</span>
+            </h3>
+            <form onsubmit="addExpense(event)" class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-muted mb-1">幣別</label>
+                        <select id="exp-currency" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-[#059669]">
+                            <option value="KRW">韓元 (KRW)</option>
+                            <option value="TWD">台幣 (TWD)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-muted mb-1">付款方式</label>
+                        <select id="exp-method" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-[#059669]">
+                            <option value="現金">💵 現金</option>
+                            <option value="刷卡">💳 刷卡</option>
+                            <option value="交通卡">🚇 交通卡/T-Money</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="col-span-1">
+                        <label class="block text-[11px] font-bold text-muted mb-1">類別</label>
+                        <select id="exp-category" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-[#059669]">
+                            <option value="飲食">飲食</option>
+                            <option value="交通">交通</option>
+                            <option value="購物">購物</option>
+                            <option value="門票">門票</option>
+                            <option value="住宿">住宿</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-[11px] font-bold text-muted mb-1">金額</label>
+                        <input type="number" id="exp-amount" placeholder="0" required min="1" class="w-full px-3 py-2 border border-line rounded-lg text-sm font-bold text-ink bg-bg/10 focus:outline-none focus:border-[#059669]">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-muted mb-1">項目名稱 / 備註</label>
+                    <input type="text" id="exp-note" placeholder="例如：晚餐烤肉、便利商店..." required class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-[#059669]">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-muted mb-1">上傳收據或商品照片 (選填)</label>
+                    <input type="file" id="exp-img" accept="image/*" class="w-full text-xs text-muted border border-line rounded-lg p-1 bg-bg/10 focus:outline-none">
+                </div>
+
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeExpenseModal()" class="flex-1 py-2.5 bg-line text-ink font-bold rounded-lg text-sm">取消</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-[#059669] text-white font-bold rounded-lg text-sm shadow hover:opacity-90 active:scale-98 transition flex items-center justify-center space-x-1">
+                        <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                        <span>記上一筆</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Trip Add/Edit -->
+    <div id="trip-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="custom-card bg-surface w-full max-w-sm p-5 space-y-4">
+            <h3 class="font-bold text-base text-maroon flex items-center space-x-1">
+                <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                <span id="trip-modal-title">新增行程</span>
+            </h3>
+            <form onsubmit="submitTrip(event)" class="space-y-3">
+                <input type="hidden" id="trip-day-idx">
+                <input type="hidden" id="trip-item-idx">
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="text" id="trip-time" placeholder="時間(例:10:00)" required class="col-span-1 px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-maroon">
+                    <input type="text" id="trip-name" placeholder="地點名稱" required class="col-span-2 px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-maroon">
+                </div>
+                <input type="text" id="trip-addr" placeholder="地址 (用於地圖導航)" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-maroon">
+                <input type="text" id="trip-transport" placeholder="交通方式說明" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-maroon">
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeTripModal()" class="flex-1 py-2.5 bg-line text-ink font-bold rounded-lg text-sm">取消</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-maroon text-white font-bold rounded-lg text-sm shadow">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Buy Region Add/Edit -->
+    <div id="region-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="custom-card bg-surface w-full max-w-sm p-5 space-y-4">
+            <h3 class="font-bold text-base text-accent flex items-center space-x-1">
+                <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                <span id="region-modal-title">新增推薦區域</span>
+            </h3>
+            <form onsubmit="submitRegion(event)" class="space-y-3">
+                <input type="hidden" id="region-idx">
+                <input type="text" id="region-name" placeholder="區域名稱 (例: 弘大)" required class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-accent">
+                <input type="text" id="region-tag" placeholder="分類標籤 (例: 美食)" required class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-accent">
+                
+                <div>
+                    <label class="block text-[11px] font-bold text-muted mb-1">標籤顏色 (點擊選擇)</label>
+                    <div class="flex flex-wrap gap-2" id="region-color-picker"></div>
+                    <input type="hidden" id="region-color" value="">
+                </div>
+
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeRegionModal()" class="flex-1 py-2.5 bg-line text-ink font-bold rounded-lg text-sm">取消</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-accent text-white font-bold rounded-lg text-sm shadow">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Buy Item Add/Edit -->
+    <div id="buy-item-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="custom-card bg-surface w-full max-w-sm p-5 space-y-4">
+            <h3 class="font-bold text-base text-accent flex items-center space-x-1">
+                <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                <span id="buy-item-modal-title">新增細項</span>
+            </h3>
+            <form onsubmit="submitBuyItem(event)" class="space-y-3">
+                <input type="hidden" id="buy-item-r-idx">
+                <input type="hidden" id="buy-item-i-idx">
+                <input type="text" id="buy-item-name" placeholder="項目名稱" required class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-accent">
+                <input type="text" id="buy-item-note" placeholder="備註說明 (選填)" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-accent">
+                <input type="text" id="buy-item-pill" placeholder="分類小標籤 (例: 美妝)" required class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-accent">
+                
+                <div>
+                    <label class="block text-[11px] font-bold text-muted mb-1">標籤顏色 (點擊選擇)</label>
+                    <div class="flex flex-wrap gap-2" id="buy-item-color-picker"></div>
+                    <input type="hidden" id="buy-item-color" value="">
+                </div>
+
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeBuyItemModal()" class="flex-1 py-2.5 bg-line text-ink font-bold rounded-lg text-sm">取消</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-accent text-white font-bold rounded-lg text-sm shadow">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // -------------------------
+        // State & Data Management
+        // -------------------------
+        let exchangeRate = 0.0233; // 預設匯率
+
+        // 預設三天行程資料結構
+        let tripData = [
+            { day: 1, items: [
+                { time: "10:00", name: "新村站", addr: "서울 서대문구 신촌로 90", transport: "金浦機場搭 AREX → 弘大入口站，轉2號線1站" },
+                { time: "14:00", name: "弘大商圈", addr: "서울 마포구 양화로 지하 160", transport: "2號線 弘大入口站 9號出口" }
+            ]},
+            { day: 2, items: [
+                { time: "09:30", name: "景福宮", addr: "서울 종로구 사직로 161", transport: "3號線 景福宮站 5號出口" },
+                { time: "13:00", name: "明洞購物街", addr: "서울 중구 명동8길", transport: "4號線 明洞站 6號出口" }
+            ]},
+            { day: 3, items: [
+                { time: "15:00", name: "南山首爾塔", addr: "서울 용산구 남산공원길 105", transport: "明洞站步行＋南山纜車" }
+            ]}
+        ];
+
+        let buyData = [
+            { region: "明洞", tag: "美妝", items: [
+                { name: "innisfree 綠茶保濕", note: "藥妝店常有買二送一", pill: "美妝" },
+                { name: "可萊絲面膜", note: "整箱較划算", pill: "美妝" }
+            ]},
+            { region: "樂天超市", tag: "零食", items: [
+                { name: "蜂蜜奶油杏仁", note: "經典必買", pill: "零食" }
+            ]}
+        ];
+
+        let shoppingData = [];
+        let expenseData = [];
+        let prepData = [];
+        
+        const defaultPrepList = [
+            { category: "隨身包", items: [{name: "護照", checked: false}, {name: "錢包", checked: false}, {name: "手機", checked: false}] },
+            { category: "生活用品", items: [{name: "化妝水", checked: false}, {name: "乳液", checked: false}] }
+        ];
+
+        function saveData() {
+            try {
+                localStorage.setItem('seoul_trip', JSON.stringify(tripData));
+                localStorage.setItem('seoul_buy', JSON.stringify(buyData));
+                localStorage.setItem('seoul_shopping', JSON.stringify(shoppingData));
+                localStorage.setItem('seoul_prep', JSON.stringify(prepData));
+                localStorage.setItem('seoul_expense', JSON.stringify(expenseData));
+            } catch (error) {
+                console.error('儲存資料錯誤', error);
+            }
+        }
+
+        function loadData() {
+            try {
+                const t = localStorage.getItem('seoul_trip');
+                if (t) {
+                    const parsed = JSON.parse(t);
+                    if (parsed.length > 0 && !parsed[0].day) {
+                        tripData = [ { day: 1, items: parsed }, { day: 2, items: [] }, { day: 3, items: [] } ];
+                    } else {
+                        tripData = parsed;
+                    }
+                }
+                const b = localStorage.getItem('seoul_buy'); if (b) buyData = JSON.parse(b);
+                const s = localStorage.getItem('seoul_shopping'); if (s) shoppingData = JSON.parse(s);
+                const e = localStorage.getItem('seoul_expense'); if (e) expenseData = JSON.parse(e);
+                
+                const p = localStorage.getItem('seoul_prep');
+                if (p) {
+                    prepData = JSON.parse(p);
+                } else {
+                    prepData = JSON.parse(JSON.stringify(defaultPrepList));
+                }
+            } catch (error) {
+                console.error("載入資料錯誤", error);
+            }
+        }
+
+        // -------------------------
+        // UI & Common Utilities
+        // -------------------------
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-accent');
+                btn.classList.add('text-muted');
+            });
+            document.getElementById('nav-' + tabId).classList.add('text-accent');
+            document.getElementById('nav-' + tabId).classList.remove('text-muted');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100', '-translate-y-4');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', '-translate-y-4');
+                toast.classList.add('opacity-0');
+            }, 2000);
+        }
+
+        let currentConfirmCallback = null;
+        function showConfirm(msg, callback) {
+            document.getElementById('confirm-text').textContent = msg;
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            currentConfirmCallback = callback;
+        }
+
+        function closeConfirm() {
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            currentConfirmCallback = null;
+        }
+
+        const pillColors = [
+            'bg-[#F26457]', // 珊瑚紅
+            'bg-[#F4A261]', // 活力橘
+            'bg-[#E9C46A]', // 暖陽黃
+            'bg-[#2A9D8F]', // 湖水綠
+            'bg-[#00B4D8]', // 亮青色
+            'bg-[#457B9D]', // 灰藍色
+            'bg-[#60A5FA]', // 柔和藍
+            'bg-[#A259BA]', // 薰衣草紫
+            'bg-[#F48FB1]', // 櫻花粉
+            'bg-[#8E8894]'  // 質感灰
+        ];
+
+        function initColorPickers() {
+            const createPicker = (containerId, inputId) => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                container.innerHTML = pillColors.map(color => `
+                    <div onclick="selectColor('${inputId}', '${color}', this)" 
+                         class="w-6 h-6 rounded-full cursor-pointer ${color} border border-black/10 transition-transform hover:scale-110 color-swatch shadow-sm">
+                    </div>
+                `).join('');
+            };
+            createPicker('region-color-picker', 'region-color');
+            createPicker('buy-item-color-picker', 'buy-item-color');
+        }
+
+        function selectColor(inputId, color, element) {
+            document.getElementById(inputId).value = color;
+            const container = element.parentElement;
+            container.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('ring-2', 'ring-offset-1', 'ring-ink'));
+            element.classList.add('ring-2', 'ring-offset-1', 'ring-ink');
+        }
+        
+        function resetColorPicker(inputId, defaultColor = '') {
+            const input = document.getElementById(inputId);
+            const container = input.previousElementSibling;
+            input.value = defaultColor;
+            container.querySelectorAll('.color-swatch').forEach(el => {
+                el.classList.remove('ring-2', 'ring-offset-1', 'ring-ink');
+                if (defaultColor && el.classList.contains(defaultColor)) {
+                    el.classList.add('ring-2', 'ring-offset-1', 'ring-ink');
+                }
+            });
+            // 預設選擇第一個顏色
+            if (!defaultColor && container.firstElementChild) {
+                selectColor(inputId, pillColors[0], container.firstElementChild);
+            }
+        }
+
+        document.getElementById('confirm-btn').addEventListener('click', () => {
+            if (currentConfirmCallback) {
+                currentConfirmCallback();
+                closeConfirm();
+            }
+        });
+
+        function getPillStyle(text, customColor = null) {
+            let bg = customColor;
+            if (!bg) {
+                const t = text || '';
+                bg = 'bg-[#60A5FA]'; // 預設柔和藍色
+                
+                if (t.includes('美妝') || t.includes('保養')) bg = 'bg-[#A259BA]'; 
+                else if (t.includes('美食') || t.includes('吃') || t.includes('餐')) bg = 'bg-[#F26457]'; 
+            else if (t.includes('零食') || t.includes('伴手')) bg = 'bg-[#F4A261]'; // 橘色
+            else if (t.includes('文創') || t.includes('小物')) bg = 'bg-[#2A9D8F]'; // 湖水綠
+            else if (t.includes('現金')) bg = 'bg-[#E9C46A]'; // 黃色
+                else if (t.includes('現金')) bg = 'bg-[#E9C46A]'; 
+                else if (t.includes('刷卡')) bg = 'bg-[#457B9D]'; 
+            }
+            return `${bg} text-white px-1.5 py-0.5 rounded text-[10px] font-normal shadow-sm tracking-wider inline-block leading-none align-middle`;
+        }
+
+        function openImageModal(imgSrc) {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('modal-image');
+            if (modal && img && imgSrc) {
+                img.src = imgSrc;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('image-modal');
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function openMap(type, addr, name) {
+            if (!addr) return;
+            const query = encodeURIComponent(addr);
+            if (type === 'google') {
+                window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+            } else if (type === 'naver') {
+                window.open(`https://map.naver.com/v5/search/${query}`, '_blank');
+            }
+        }
+
+        // -------------------------
+        // Tab 1: 行程規劃 (Itinerary)
+        // -------------------------
+        function renderItinerary() {
+            const container = document.getElementById('itinerary-list');
+            container.innerHTML = '';
+            
+            const locationSelect = document.getElementById('shop-location-id');
+            if (locationSelect) {
+                locationSelect.innerHTML = '<option value="">不指定 (僅列在購物清單)</option>';
+            }
+
+            tripData.forEach((dayGroup, dayIndex) => {
+                let itemsHtml = '';
+
+                dayGroup.items.forEach((item, itemIndex) => {
+                    const uniqueId = `trip-${dayIndex}-${itemIndex}`;
+                    
+                    if (locationSelect) {
+                        locationSelect.innerHTML += `<option value="${uniqueId}">Day ${dayIndex+1} - ${item.name}</option>`;
+                    }
+
+                    const linkedShopping = shoppingData.filter(s => s.locationId === uniqueId);
+                    let shoppingHtml = '';
+                    if (linkedShopping.length > 0) {
+                        shoppingHtml = `
+                            <div class="mt-3 bg-blue/5 rounded-lg p-3 border border-blue/20">
+                                <div class="text-[11px] font-bold text-blue mb-2 flex items-center space-x-1">
+                                    <svg class="w-3.5 h-3.5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                    <span>購物清單</span>
+                                </div>
+                                <div class="space-y-1">
+                                    ${linkedShopping.map((s) => {
+                                        const sIndex = shoppingData.findIndex(x => x.id === s.id);
+                                        return `
+                                            <label class="flex items-start space-x-2 cursor-pointer group">
+                                                <div class="relative flex-shrink-0 mt-0.5">
+                                                    <input type="checkbox" ${s.checked ? 'checked' : ''} onchange="toggleShoppingFromItinerary(${sIndex})" class="sr-only">
+                                                    <div class="w-4 h-4 border-2 rounded-[4px] flex items-center justify-center transition ${s.checked ? 'bg-black border-black' : 'border-black'}">
+                                                        <svg class="w-3 h-3 text-white stroke-current ${s.checked ? 'opacity-100' : 'opacity-0'}" fill="none" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                                    </div>
+                                                </div>
+                                                <span class="text-xs font-bold ${s.checked ? 'text-muted line-through' : 'text-ink'} group-hover:text-accent transition">
+                                                    ${s.name} ${s.qty > 1 ? `<span class="text-[10px] text-muted ml-1">x${s.qty}</span>` : ''}
+                                                </span>
+                                            </label>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    itemsHtml += `
+                        <div class="relative pl-8 mb-5 last:mb-0 z-10 group">
+                            <div class="absolute left-[7px] top-1.5 w-2.5 h-2.5 rounded-full bg-accent shadow-sm"></div>
+
+                            <div class="flex flex-col space-y-2">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex items-center space-x-2 flex-wrap">
+                                        <span class="font-bold text-accent text-sm">${item.time || '--:--'}</span>
+                                        <h4 class="font-bold text-base text-maroon">${item.name}</h4>
+                                    </div>
+                                    <div class="flex space-x-2 ml-2">
+                                        <button onclick="editTrip(${dayIndex}, ${itemIndex})" class="p-1 text-muted hover:text-blue transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
+                                        <button onclick="deleteTrip(${dayIndex}, ${itemIndex})" class="p-1 text-muted hover:text-accent transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center text-xs text-muted space-x-1 flex-wrap">
+                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                                    <span class="mr-2">${item.addr}</span>
+                                    <div class="flex space-x-1.5 mt-1 sm:mt-0">
+                                        <button onclick="openMap('google', '${item.addr}', '${item.name}')" class="bg-[#29A9E0] text-white p-1 rounded hover:opacity-90 flex items-center justify-center shadow-sm" title="Google地圖">
+                                            <svg class="w-3.5 h-3.5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                                        </button>
+                                        <button onclick="openMap('naver', '${item.addr}', '${item.name}')" class="bg-[#03C75A] text-white p-1 rounded hover:opacity-90 flex items-center justify-center shadow-sm" title="NAVER地圖">
+                                            <svg class="w-3.5 h-3.5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start text-xs text-muted space-x-1">
+                                    <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                                    <span>${item.transport}</span>
+                                </div>
+
+                                ${shoppingHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const dayHtml = `
+                    <div class="custom-card bg-surface p-4 mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 stroke-current text-accent" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <h3 class="font-bold text-lg text-maroon">Day ${dayIndex + 1}</h3>
+                            </div>
+                            <button onclick="addTrip(${dayIndex})" class="w-7 h-7 shrink-0 flex items-center justify-center rounded-full border-2 border-dashed border-maroon text-maroon hover:bg-maroon/5 transition" title="新增 Day ${dayIndex + 1} 行程">
+                                <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                            </button>
+                        </div>
+                        <div class="space-y-0 relative">
+                            <div class="absolute top-4 bottom-4 left-[11px] w-0 z-0" style="border-left: 2px dashed rgba(206,56,67,0.5);"></div>
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += dayHtml;
+            });
+        }
+
+        // 新增/編輯 行程 (使用 Modal)
+        function addTrip(dayIndex) {
+            document.getElementById('trip-modal-title').textContent = `新增 Day ${dayIndex + 1} 行程`;
+            document.getElementById('trip-day-idx').value = dayIndex;
+            document.getElementById('trip-item-idx').value = '';
+            document.getElementById('trip-time').value = '10:00';
+            document.getElementById('trip-name').value = '';
+            document.getElementById('trip-addr').value = '';
+            document.getElementById('trip-transport').value = '';
+            document.getElementById('trip-modal').classList.remove('hidden');
+            document.getElementById('trip-modal').classList.add('flex');
+        }
+
+        function editTrip(dayIndex, itemIndex) {
+            const item = tripData[dayIndex].items[itemIndex];
+            document.getElementById('trip-modal-title').textContent = `編輯行程`;
+            document.getElementById('trip-day-idx').value = dayIndex;
+            document.getElementById('trip-item-idx').value = itemIndex;
+            document.getElementById('trip-time').value = item.time;
+            document.getElementById('trip-name').value = item.name;
+            document.getElementById('trip-addr').value = item.addr;
+            document.getElementById('trip-transport').value = item.transport;
+            document.getElementById('trip-modal').classList.remove('hidden');
+            document.getElementById('trip-modal').classList.add('flex');
+        }
+
+        function closeTripModal() {
+            document.getElementById('trip-modal').classList.remove('flex');
+            document.getElementById('trip-modal').classList.add('hidden');
+        }
+
+        function submitTrip(e) {
+            e.preventDefault();
+            const dayIndex = parseInt(document.getElementById('trip-day-idx').value);
+            const itemIdxVal = document.getElementById('trip-item-idx').value;
+            const time = document.getElementById('trip-time').value.trim();
+            const name = document.getElementById('trip-name').value.trim();
+            const addr = document.getElementById('trip-addr').value.trim();
+            const transport = document.getElementById('trip-transport').value.trim();
+
+            if (itemIdxVal === '') {
+                // Add
+                tripData[dayIndex].items.push({ time, name, addr, transport });
+                showToast('已新增行程');
+            } else {
+                // Edit
+                const itemIndex = parseInt(itemIdxVal);
+                tripData[dayIndex].items[itemIndex] = { time, name, addr, transport };
+                showToast('已更新行程');
+            }
+            
+            tripData[dayIndex].items.sort((a, b) => a.time.localeCompare(b.time));
+            saveData();
+            renderItinerary();
+            closeTripModal();
+        }
+
+        function deleteTrip(dayIndex, itemIndex) {
+            showConfirm('確定要刪除這個行程嗎？', () => {
+                const uniqueId = `trip-${dayIndex}-${itemIndex}`;
+                shoppingData.forEach(s => {
+                    if (s.locationId === uniqueId) s.locationId = '';
+                });
+
+                tripData[dayIndex].items.splice(itemIndex, 1);
+                saveData();
+                renderItinerary();
+                renderShopping();
+                showToast('已刪除行程');
+            });
+        }
+
+        // -------------------------
+        // Tab 2: 必買必吃推薦 (Buy/Eat)
+        // -------------------------
+        function renderBuy() {
+            const container = document.getElementById('buy-list');
+            container.innerHTML = '';
+            buyData.forEach((region, rIndex) => {
+                let itemsHtml = region.items.map((item, iIndex) => `
+                    <div class="flex items-center justify-between py-2 border-b border-line last:border-0 group">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-medium text-sm text-ink group-hover:text-accent transition">${item.name}</span>
+                                <span class="${getPillStyle(item.pill, item.color)}">${item.pill}</span>
+                            </div>
+                            <p class="text-xs text-muted mt-0.5">${item.note}</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button onclick="addToShopping('${item.name}', '${item.note}')" class="p-1.5 text-blue hover:bg-blue/10 rounded transition" title="加入清單">
+                                <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                            </button>
+                            <button onclick="editBuyItem(${rIndex}, ${iIndex})" class="p-1.5 text-muted hover:text-blue transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
+                            <button onclick="deleteBuyItem(${rIndex}, ${iIndex})" class="p-1.5 text-muted hover:text-accent transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="custom-card bg-surface overflow-hidden">
+                        <div class="p-4 flex items-center justify-between">
+                            <div class="flex items-center space-x-2 flex-1 cursor-pointer" onclick="toggleRegion(this)">
+                                <h3 class="font-bold text-lg text-maroon">${region.region}</h3>
+                                <span class="${getPillStyle(region.tag, region.color)}">${region.tag}</span>
+                            </div>
+                            <div class="flex space-x-1">
+                                <button onclick="editBuyRegion(${rIndex})" class="p-1 text-muted hover:text-blue"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
+                                <button onclick="deleteBuyRegion(${rIndex})" class="p-1 text-muted hover:text-accent"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                <button onclick="toggleRegion(this.parentElement.previousElementSibling)" class="p-1 text-muted transform transition-transform"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"></path></svg></button>
+                            </div>
+                        </div>
+                        <div class="px-4 pb-2">
+                            ${itemsHtml}
+                            <button onclick="addBuyItem(${rIndex})" class="mt-2 w-full py-2 text-xs font-bold text-muted border-2 border-dashed border-line rounded-lg hover:bg-bg/50 flex justify-center items-center space-x-1">
+                                <svg class="w-3 h-3 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                                <span>新增細項</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleRegion(element) {
+            const btn = element.parentElement.querySelector('button:last-child');
+            const content = element.parentElement.nextElementSibling;
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                btn.classList.remove('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                btn.classList.add('rotate-180');
+            }
+        }
+
+        // 新增/編輯 推薦區域 (使用 Modal)
+        function addBuyRegion() {
+            document.getElementById('region-modal-title').textContent = '新增推薦區域';
+            document.getElementById('region-idx').value = '';
+            document.getElementById('region-name').value = '';
+            document.getElementById('region-tag').value = '';
+            resetColorPicker('region-color');
+            document.getElementById('region-modal').classList.remove('hidden');
+            document.getElementById('region-modal').classList.add('flex');
+        }
+
+        function editBuyRegion(index) {
+            const r = buyData[index];
+            document.getElementById('region-modal-title').textContent = '編輯推薦區域';
+            document.getElementById('region-idx').value = index;
+            document.getElementById('region-name').value = r.region;
+            document.getElementById('region-tag').value = r.tag;
+            resetColorPicker('region-color', r.color);
+            document.getElementById('region-modal').classList.remove('hidden');
+            document.getElementById('region-modal').classList.add('flex');
+        }
+
+        function editBuyRegion(index) {
+            const r = buyData[index];
+            document.getElementById('region-modal-title').textContent = '編輯推薦區域';
+            document.getElementById('region-idx').value = index;
+            document.getElementById('region-name').value = r.region;
+            document.getElementById('region-tag').value = r.tag;
+            document.getElementById('region-modal').classList.remove('hidden');
+            document.getElementById('region-modal').classList.add('flex');
+        }
+
+        function closeRegionModal() {
+            document.getElementById('region-modal').classList.remove('flex');
+            document.getElementById('region-modal').classList.add('hidden');
+        }
+
+        function submitRegion(e) {
+            e.preventDefault();
+            const idxVal = document.getElementById('region-idx').value;
+            const region = document.getElementById('region-name').value.trim();
+            const tag = document.getElementById('region-tag').value.trim() || '推薦';
+            const color = document.getElementById('region-color').value;
+
+            if (idxVal === '') {
+                buyData.push({ region, tag, color, items: [] });
+                showToast('已新增推薦區域');
+            } else {
+                buyData[parseInt(idxVal)].region = region;
+                buyData[parseInt(idxVal)].tag = tag;
+                buyData[parseInt(idxVal)].color = color;
+                showToast('已更新區域');
+            }
+            saveData();
+            renderBuy();
+            closeRegionModal();
+        }
+
+        function deleteBuyRegion(index) {
+            showConfirm('確定要刪除整個區域與裡面的項目嗎？', () => {
+                buyData.splice(index, 1);
+                saveData();
+                renderBuy();
+                showToast('已刪除區域');
+            });
+        }
+
+        // 新增/編輯 必買項目 (使用 Modal)
+        function addBuyItem(rIndex) {
+            document.getElementById('buy-item-modal-title').textContent = '新增細項';
+            document.getElementById('buy-item-r-idx').value = rIndex;
+            document.getElementById('buy-item-i-idx').value = '';
+            document.getElementById('buy-item-name').value = '';
+            document.getElementById('buy-item-note').value = '';
+            document.getElementById('buy-item-pill').value = '';
+            resetColorPicker('buy-item-color');
+            document.getElementById('buy-item-modal').classList.remove('hidden');
+            document.getElementById('buy-item-modal').classList.add('flex');
+        }
+
+        function editBuyItem(rIndex, iIndex) {
+            const item = buyData[rIndex].items[iIndex];
+            document.getElementById('buy-item-modal-title').textContent = '編輯細項';
+            document.getElementById('buy-item-r-idx').value = rIndex;
+            document.getElementById('buy-item-i-idx').value = iIndex;
+            document.getElementById('buy-item-name').value = item.name;
+            document.getElementById('buy-item-note').value = item.note;
+            document.getElementById('buy-item-pill').value = item.pill;
+            resetColorPicker('buy-item-color', item.color);
+            document.getElementById('buy-item-modal').classList.remove('hidden');
+            document.getElementById('buy-item-modal').classList.add('flex');
+        }
+
+        function editBuyItem(rIndex, iIndex) {
+            const item = buyData[rIndex].items[iIndex];
+            document.getElementById('buy-item-modal-title').textContent = '編輯細項';
+            document.getElementById('buy-item-r-idx').value = rIndex;
+            document.getElementById('buy-item-i-idx').value = iIndex;
+            document.getElementById('buy-item-name').value = item.name;
+            document.getElementById('buy-item-note').value = item.note;
+            document.getElementById('buy-item-pill').value = item.pill;
+            document.getElementById('buy-item-modal').classList.remove('hidden');
+            document.getElementById('buy-item-modal').classList.add('flex');
+        }
+
+        function closeBuyItemModal() {
+            document.getElementById('buy-item-modal').classList.remove('flex');
+            document.getElementById('buy-item-modal').classList.add('hidden');
+        }
+
+        function submitBuyItem(e) {
+            e.preventDefault();
+            const rIndex = parseInt(document.getElementById('buy-item-r-idx').value);
+            const iIdxVal = document.getElementById('buy-item-i-idx').value;
+            const name = document.getElementById('buy-item-name').value.trim();
+            const note = document.getElementById('buy-item-note').value.trim();
+            const pill = document.getElementById('buy-item-pill').value.trim() || '推薦';
+            const color = document.getElementById('buy-item-color').value;
+
+            if (iIdxVal === '') {
+                buyData[rIndex].items.push({ name, note, pill, color });
+            } else {
+                const iIndex = parseInt(iIdxVal);
+                buyData[rIndex].items[iIndex] = { name, note, pill, color };
+            }
+            saveData();
+            renderBuy();
+            closeBuyItemModal();
+        }
+
+        function deleteBuyItem(rIndex, iIndex) {
+            showConfirm('確定刪除此項目？', () => {
+                buyData[rIndex].items.splice(iIndex, 1);
+                saveData();
+                renderBuy();
+            });
+        }
+
+        function addToShopping(name, note) {
+            shoppingData.push({
+                id: Date.now().toString(),
+                name: name,
+                qty: '1',
+                note: note || '',
+                imgSrc: '',
+                link: '',
+                checked: false,
+                locationId: ''
+            });
+            saveData();
+            renderShopping();
+            renderItinerary();
+            showToast('✅ 已加入購物清單！');
+        }
+
+        // -------------------------
+        // Tab 3: 清單 (購物 & 行前)
+        // -------------------------
+        function toggleShoppingFromItinerary(index) {
+            toggleShopping(index);
+        }
+
+        function renderShopping() {
+            const container = document.getElementById('shopping-list');
+            if (shoppingData.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs font-bold text-muted py-4">目前購物清單空空如也，快從必買推薦加入或手動新增吧！</div>`;
+                return;
+            }
+            container.innerHTML = shoppingData.map((item, index) => {
+                let imgHtml = item.imgSrc ? `<img src="${item.imgSrc}" onclick="openImageModal('${item.imgSrc}')" class="w-12 h-12 rounded object-cover border border-line cursor-pointer shrink-0 ml-2">` : '';
+                let linkBtn = item.link ? `<a href="${item.link}" target="_blank" class="ml-2 bg-blue/10 text-blue p-1.5 rounded hover:bg-blue/20 transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>` : '';
+                let locBadge = '';
+                if(item.locationId) {
+                    const [d, i] = item.locationId.replace('trip-','').split('-');
+                    if(tripData[d] && tripData[d].items[i]) {
+                        locBadge = `<span class="inline-flex items-center space-x-1 text-[10px] text-blue bg-blue/5 border border-blue/20 px-1.5 py-0.5 rounded ml-2"><svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg><span>Day ${parseInt(d)+1} ${tripData[d].items[i].name}</span></span>`;
+                    }
+                }
+                
+                return `
+                <div class="flex items-center justify-between group transition-colors py-2 ${item.checked ? 'opacity-60' : ''}">
+                    <div class="flex items-center flex-1 min-w-0">
+                        <label class="flex items-center cursor-pointer mr-3 shrink-0">
+                            <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleShopping(${index})" class="sr-only">
+                            <div class="w-4 h-4 border-2 rounded-[4px] flex items-center justify-center transition ${item.checked ? 'bg-black border-black' : 'border-black'}">
+                                <svg class="w-3 h-3 text-white stroke-current ${item.checked ? 'opacity-100' : 'opacity-0'}" fill="none" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                        </label>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center flex-wrap">
+                                <span class="font-medium text-sm ${item.checked ? 'text-muted line-through' : 'text-ink'} truncate">${item.name}</span>
+                                <span class="text-xs font-bold text-accent ml-2 shrink-0">x${item.qty}</span>
+                                ${locBadge}
+                            </div>
+                            ${item.note ? `<p class="text-xs text-muted truncate mt-0.5">${item.note}</p>` : ''}
+                        </div>
+                        ${imgHtml}
+                    </div>
+                    <div class="flex items-center space-x-1 ml-2 shrink-0">
+                        ${linkBtn}
+                        <button onclick="deleteShopping(${index})" class="p-1.5 text-muted hover:text-accent transition rounded">
+                            <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function toggleShopping(index) {
+            shoppingData[index].checked = !shoppingData[index].checked;
+            saveData();
+            renderShopping();
+            renderItinerary();
+        }
+
+        function deleteShopping(index) {
+            showConfirm('確定要刪除這個商品嗎？', () => {
+                shoppingData.splice(index, 1);
+                saveData();
+                renderShopping();
+                renderItinerary();
+                showToast('已刪除商品');
+            });
+        }
+
+        function openShoppingModal() {
+            const select = document.getElementById('shop-location-id');
+            let options = '<option value="">不指定 (僅列在購物清單)</option>';
+            tripData.forEach((day, dIdx) => {
+                day.items.forEach((item, iIdx) => {
+                    options += `<option value="trip-${dIdx}-${iIdx}">Day ${dIdx+1} ${item.time||''} ${item.name}</option>`;
+                });
+            });
+            select.innerHTML = options;
+
+            document.getElementById('shop-name').value = '';
+            document.getElementById('shop-qty').value = '1';
+            document.getElementById('shop-note').value = '';
+            document.getElementById('shop-link').value = '';
+            document.getElementById('shop-img').value = '';
+            
+            const modal = document.getElementById('shopping-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeShoppingModal() {
+            const modal = document.getElementById('shopping-modal');
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function addShoppingItem(e) {
+            e.preventDefault();
+            const name = document.getElementById('shop-name').value.trim();
+            const qty = document.getElementById('shop-qty').value.trim() || '1';
+            const note = document.getElementById('shop-note').value.trim();
+            const link = document.getElementById('shop-link').value.trim();
+            const locationId = document.getElementById('shop-location-id').value;
+            const imgInput = document.getElementById('shop-img');
+            
+            const finalizeAdd = (imgSrc = '') => {
+                shoppingData.push({ id: Date.now().toString(), name, qty, note, imgSrc, link, checked: false, locationId });
+                saveData();
+                renderShopping();
+                renderItinerary();
+                showToast('已新增商品');
+                closeShoppingModal();
+            };
+
+            if (imgInput.files && imgInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    finalizeAdd(event.target.result);
+                };
+                reader.readAsDataURL(imgInput.files[0]);
+                return;
+            }
+
+            finalizeAdd('');
+        }
+
+        function renderPrep() {
+            const container = document.getElementById('prep-list');
+            if (prepData.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs font-bold text-muted py-4">目前沒有行前準備項目，快新增吧！</div>`;
+                return;
+            }
+            container.innerHTML = prepData.map((cat, cIndex) => `
+                <div class="custom-card bg-surface overflow-hidden border-orange">
+                    <div class="bg-orange/5 px-3 py-2 flex items-center justify-between border-b border-orange/10">
+                        <h4 class="font-bold text-sm text-orange">${cat.category}</h4>
+                        <button onclick="deletePrepCategory(${cIndex})" class="p-1 text-muted hover:text-accent transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    </div>
+                    <div class="p-2 space-y-1">
+                        ${cat.items.map((item, iIndex) => `
+                            <div class="flex items-center justify-between p-2 hover:bg-bg/50 rounded transition group">
+                                <label class="flex items-center cursor-pointer flex-1">
+                                    <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="togglePrepCheck(${cIndex}, ${iIndex})" class="sr-only">
+                                    <div class="w-4 h-4 border-2 rounded-[4px] flex items-center justify-center transition mr-3 ${item.checked ? 'bg-black border-black' : 'border-black'}">
+                                        <svg class="w-3 h-3 text-white stroke-current ${item.checked ? 'opacity-100' : 'opacity-0'}" fill="none" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <span class="text-sm font-medium ${item.checked ? 'text-muted line-through' : 'text-ink'}">${item.name}</span>
+                                </label>
+                                <button onclick="deletePrepItem(${cIndex}, ${iIndex})" class="text-muted hover:text-accent p-1 opacity-0 group-hover:opacity-100 transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function togglePrepCheck(cIndex, iIndex) {
+            prepData[cIndex].items[iIndex].checked = !prepData[cIndex].items[iIndex].checked;
+            saveData();
+            renderPrep();
+        }
+
+        function deletePrepItem(cIndex, iIndex) {
+            prepData[cIndex].items.splice(iIndex, 1);
+            if (prepData[cIndex].items.length === 0) prepData.splice(cIndex, 1);
+            saveData();
+            renderPrep();
+        }
+
+        function deletePrepCategory(cIndex) {
+            showConfirm('確定刪除這個類別及裡面所有項目？', () => {
+                prepData.splice(cIndex, 1);
+                saveData();
+                renderPrep();
+            });
+        }
+
+        function openPrepModal() {
+            document.getElementById('prep-category').value = '';
+            document.getElementById('prep-name').value = '';
+            document.getElementById('prep-modal').classList.remove('hidden');
+            document.getElementById('prep-modal').classList.add('flex');
+        }
+
+        function closePrepModal() {
+            const modal = document.getElementById('prep-modal');
+            if(modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function addPrepItem(e) {
+            e.preventDefault();
+            const categoryInput = document.getElementById('prep-category');
+            const nameInput = document.getElementById('prep-name');
+            const category = categoryInput.value.trim() || '其他';
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            let catObj = prepData.find(c => c.category === category);
+            if (catObj) {
+                catObj.items.push({ name, checked: false });
+            } else {
+                prepData.push({ category, items: [{ name, checked: false }] });
+            }
+            
+            saveData();
+            renderPrep();
+            
+            showToast('已新增準備項目');
+            closePrepModal();
+        }
+
+        // -------------------------
+        // Tab 4: 記帳 (Expense)
+        // -------------------------
+        function getCategoryIcon(cat) {
+            const svgClass = "w-5 h-5 stroke-current text-[#059669]";
+            const icons = {
+                '飲食': `<svg class="${svgClass}" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15c0-4.418-4.03-8-9-8s-9 3.582-9 8h18zM12 7V3M8 7V4M16 7V4M3 15v2a2 2 0 002 2h14a2 2 0 002-2v-2"/></svg>`,
+                '交通': `<svg class="${svgClass}" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8M8 11h8M6 18h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v9a2 2 0 002 2zM9 15h.01M15 15h.01"/></svg>`,
+                '購物': `<svg class="${svgClass}" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>`,
+                '門票': `<svg class="${svgClass}" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>`,
+                '住宿': `<svg class="${svgClass}" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 16h18M5 8h14M5 12V8a2 2 0 012-2h10a2 2 0 012 2v4"/></svg>`,
+                '其他': `<svg class="${svgClass}" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>`
+            };
+            return icons[cat] || icons['其他'];
+        }
+
+        function renderExpense() {
+            const container = document.getElementById('expense-list');
+            const totalEl = document.getElementById('expense-total');
+            if(!container) return;
+
+            let totalTWD = 0;
+            container.innerHTML = expenseData.map((item, index) => {
+                let itemTWD = item.currency === 'KRW' ? Math.round(item.amount * exchangeRate) : item.amount;
+                totalTWD += itemTWD;
+                let imgHtml = item.imgSrc ? `<img src="${item.imgSrc}" onclick="openImageModal('${item.imgSrc}')" class="w-10 h-10 rounded object-cover border border-line cursor-pointer shrink-0 ml-2">` : '';
+                return `
+                <div class="custom-card bg-surface p-3 flex justify-between items-center group">
+                    <div class="flex items-center flex-1 min-w-0">
+                        <div class="w-10 h-10 rounded-full bg-[#059669]/10 flex items-center justify-center shrink-0 mr-3">
+                            ${getCategoryIcon(item.category)}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center space-x-2 flex-wrap">
+                                <span class="font-medium text-sm text-ink truncate">${item.note}</span>
+                                <span class="${getPillStyle(item.method)}">${item.method}</span>
+                            </div>
+                            <div class="text-xs text-muted mt-0.5">${item.amount.toLocaleString()} ${item.currency}</div>
+                        </div>
+                        ${imgHtml}
+                    </div>
+                    <div class="flex items-center space-x-3 ml-2 shrink-0">
+                        <div class="text-right">
+                            <div class="font-black text-sm text-[#059669]">${itemTWD.toLocaleString()}</div>
+                            <div class="text-[10px] text-muted font-bold">TWD</div>
+                        </div>
+                        <button onclick="deleteExpense(${index})" class="p-1.5 text-muted hover:text-accent transition opacity-0 group-hover:opacity-100">
+                            <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            if(expenseData.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs font-bold text-muted py-4">目前沒有任何花費紀錄</div>`;
+            }
+            if(totalEl) totalEl.textContent = totalTWD.toLocaleString();
+        }
+
+        function openExpenseModal() {
+            document.getElementById('exp-amount').value = '';
+            document.getElementById('exp-note').value = '';
+            document.getElementById('exp-img').value = '';
+            const modal = document.getElementById('expense-modal');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeExpenseModal() {
+            const modal = document.getElementById('expense-modal');
+            if(modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function addExpense(e) {
+            e.preventDefault();
+            const currency = document.getElementById('exp-currency').value;
+            const method = document.getElementById('exp-method').value;
+            const category = document.getElementById('exp-category').value;
+            const amount = parseFloat(document.getElementById('exp-amount').value);
+            const note = document.getElementById('exp-note').value.trim();
+            const imgInput = document.getElementById('exp-img');
+
+            if (!amount || !note) return;
+
+            const finalizeExpense = (imgSrc) => {
+                expenseData.unshift({ id: Date.now(), currency, method, category, amount, note, imgSrc });
+                saveData();
+                renderExpense();
+                closeExpenseModal();
+                showToast('已記下一筆花費');
+            };
+
+            if (imgInput.files && imgInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) { finalizeExpense(event.target.result); };
+                reader.readAsDataURL(imgInput.files[0]);
+            } else {
+                finalizeExpense('');
+            }
+        }
+
+        function deleteExpense(index) {
+            showConfirm('確定要刪除這筆花費嗎？', () => {
+                expenseData.splice(index, 1);
+                saveData();
+                renderExpense();
+                showToast('已刪除花費');
+            });
+        }
+
+        // -------------------------
+        // Tab 5: 實用工具 (Tools)
+        // -------------------------
+        async function loadWeather() {
+            const content = document.getElementById('weather-content');
+            if(!content) return;
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.978&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia/Seoul&forecast_days=4');
+                const data = await res.json();
+                const cur = data.current;
+                const daily = data.daily;
+                
+                const weatherIcon = (code) => {
+                    const iconClass = "w-8 h-8 stroke-current inline-block text-blue";
+                    const iconClassSm = "w-6 h-6 stroke-current inline-block text-blue my-1";
+                    
+                    if (code <= 1) return `<svg class="w-full h-full stroke-current text-orange" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`; // 晴天
+                    if (code <= 3) return `<svg class="w-full h-full stroke-current text-blue" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>`; // 多雲
+                    if (code <= 69) return `<svg class="w-full h-full stroke-current text-blue" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M8 21v-4m4 4v-4m4 4v-4"></path></svg>`; // 雨天
+                    return `<svg class="w-full h-full stroke-current text-blue" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>`; // 預設雲
+                };
+
+                let html = `
+                    <div class="flex items-center justify-center space-x-3 my-2">
+                        <div class="w-12 h-12">${weatherIcon(cur.weather_code)}</div>
+                        <div class="text-left">
+                            <div class="text-3xl font-bold text-ink">${Math.round(cur.temperature_2m)}°C</div>
+                            <div class="text-xs font-bold text-muted">目前氣溫</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 mt-4 pt-3 border-t border-line">
+                `;
+                
+                for(let i=0; i<4; i++) {
+                    const date = new Date(daily.time[i]);
+                    const dayStr = i === 0 ? '今日' : `${date.getMonth()+1}/${date.getDate()}`;
+                    html += `
+                        <div class="text-center flex flex-col items-center">
+                            <div class="text-[10px] font-bold text-muted">${dayStr}</div>
+                            <div class="w-6 h-6 my-1">${weatherIcon(daily.weather_code[i])}</div>
+                            <div class="text-[10px] font-bold text-ink">${Math.round(daily.temperature_2m_max[i])}° <span class="text-muted">${Math.round(daily.temperature_2m_min[i])}°</span></div>
+                        </div>
+                    `;
+                }
+                html += `</div>`;
+                content.innerHTML = html;
+            } catch (err) {
+                content.innerHTML = '<div class="text-xs text-muted py-2">無法取得天氣資訊，請檢查網路狀態。</div>';
+            }
+        }
+
+        async function loadExchangeRate() {
+            const status = document.getElementById('rate-status');
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/KRW');
+                const data = await res.json();
+                exchangeRate = data.rates.TWD;
+                if(status) status.innerHTML = `即時匯率 <span class="text-accent ml-1">1 KRW ≈ ${exchangeRate.toFixed(4)} TWD</span>`;
+                convertCurrency('krw');
+            } catch (err) {
+                if(status) status.innerHTML = '使用預設匯率 (1 KRW ≈ 0.0233 TWD)';
+                exchangeRate = 0.0233;
+            }
+            renderExpense();
+        }
+
+        function convertCurrency(source) {
+            const krw = document.getElementById('calc-krw');
+            const twd = document.getElementById('calc-twd');
+            if(!krw || !twd) return;
+
+            if (source === 'krw') {
+                const val = parseFloat(krw.value);
+                twd.value = val ? Math.round(val * exchangeRate) : '';
+            } else {
+                const val = parseFloat(twd.value);
+                krw.value = val ? Math.round(val / exchangeRate) : '';
+            }
+        }
+
+        function calculateSplit() {
+            const total = parseFloat(document.getElementById('split-total').value);
+            const ppl = parseInt(document.getElementById('split-ppl').value);
+            const res = document.getElementById('split-result');
+            if (total && ppl && ppl > 0) {
+                res.textContent = Math.ceil(total / ppl).toLocaleString();
+            } else {
+                res.textContent = '0';
+            }
+        }
+
+        function openTranslate(type) {
+            if (type === 'ko-tw') window.open('https://translate.google.com/?sl=ko&tl=zh-TW&op=translate', '_blank');
+            if (type === 'tw-ko') window.open('https://translate.google.com/?sl=zh-TW&tl=ko&op=translate', '_blank');
+        }
+
+        // -------------------------
+        // App Initialization
+        // -------------------------
+        document.addEventListener('DOMContentLoaded', () => {
+            initColorPickers();
+            loadData();
+            switchTab('trip');
+            
+            renderItinerary();
+            renderBuy();
+            renderShopping();
+            renderPrep();
+            renderExpense();
+            
+            loadWeather();
+            loadExchangeRate();
+        });
+    </script>
+</body>
+</html>
