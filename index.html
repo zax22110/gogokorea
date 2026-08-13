@@ -683,30 +683,32 @@
         }
 
         function loadData() {
-            try {
-                const t = localStorage.getItem('seoul_trip');
-                if (t) {
-                    const parsed = JSON.parse(t);
-                    if (parsed.length > 0 && !parsed[0].day) {
-                        tripData = [ { day: 1, items: parsed }, { day: 2, items: [] }, { day: 3, items: [] } ];
-                    } else {
-                        tripData = parsed;
-                    }
-                }
-                const b = localStorage.getItem('seoul_buy'); if (b) buyData = JSON.parse(b);
-                const s = localStorage.getItem('seoul_shopping'); if (s) shoppingData = JSON.parse(s);
-                const e = localStorage.getItem('seoul_expense'); if (e) expenseData = JSON.parse(e);
-                const tc = localStorage.getItem('seoul_tagcolors'); if (tc) tagColors = JSON.parse(tc);
+            // 預設先給 prepData 合理內容，就算下面 localStorage 讀取失敗，也不會讓它變成空陣列
+            prepData = JSON.parse(JSON.stringify(defaultPrepList));
 
-                const p = localStorage.getItem('seoul_prep');
-                if (p) {
-                    prepData = JSON.parse(p);
-                } else {
-                    prepData = JSON.parse(JSON.stringify(defaultPrepList));
+            const readJSON = (key) => {
+                try {
+                    const raw = localStorage.getItem(key);
+                    return raw ? JSON.parse(raw) : null;
+                } catch (error) {
+                    console.error('讀取資料錯誤: ' + key, error);
+                    return null;
                 }
-            } catch (error) {
-                console.error("載入資料錯誤", error);
+            };
+
+            const t = readJSON('seoul_trip');
+            if (t) {
+                if (t.length > 0 && !t[0].day) {
+                    tripData = [ { day: 1, items: t }, { day: 2, items: [] }, { day: 3, items: [] } ];
+                } else {
+                    tripData = t;
+                }
             }
+            const b = readJSON('seoul_buy'); if (b) buyData = b;
+            const s = readJSON('seoul_shopping'); if (s) shoppingData = s;
+            const e = readJSON('seoul_expense'); if (e) expenseData = e;
+            const tc = readJSON('seoul_tagcolors'); if (tc) tagColors = tc;
+            const p = readJSON('seoul_prep'); if (p) prepData = p;
         }
 
         function resetAppData() {
