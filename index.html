@@ -75,7 +75,7 @@
     <!-- Top Header -->
     <header class="px-4 py-3 shrink-0 z-10 relative">
         <div class="flex items-center justify-center space-x-2">
-            <svg class="w-6 h-6 stroke-current text-maroon rotate-45" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.126A59.77 59.77 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12Zm0 0h7.5"></path></svg>
+            <svg class="w-6 h-6 fill-current text-maroon" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2.5 1.5V22l4-1 4 1v-1.5L13 19v-5.5l8 2.5z"></path></svg>
             <h1 class="text-2xl font-bold text-maroon tracking-wide">首爾旅遊手帳</h1>
         </div>
     </header>
@@ -398,6 +398,7 @@
                     <input type="text" id="prep-category" placeholder="類別 (例: 隨身包)" required class="col-span-1 px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-orange">
                     <input type="text" id="prep-name" placeholder="項目名稱 (例: 護照)" required class="col-span-2 px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-orange">
                 </div>
+                <input type="url" id="prep-link" placeholder="參考網址 (選填，例如貼文連結)" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-orange">
 
                 <div class="flex space-x-2 pt-2">
                     <button type="button" onclick="closePrepModal()" class="flex-1 py-2.5 bg-line text-ink font-bold rounded-lg text-sm">取消</button>
@@ -491,6 +492,7 @@
                     <input type="text" id="trip-name" placeholder="地點名稱" required class="col-span-2 px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-maroon">
                 </div>
                 <input type="text" id="trip-addr" placeholder="地址 (用於地圖導航)" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-maroon">
+                <input type="url" id="trip-link" placeholder="參考網址 (選填，例如貼文連結)" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-maroon">
                 <textarea id="trip-transport" placeholder="備忘：交通方式、怎麼走、營業時間等" rows="3" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-maroon resize-none"></textarea>
                 <div class="flex space-x-2 pt-2">
                     <button type="button" onclick="closeTripModal()" class="flex-1 py-2.5 bg-line text-ink font-bold rounded-lg text-sm">取消</button>
@@ -539,6 +541,7 @@
                 <input type="hidden" id="buy-item-i-idx">
                 <input type="text" id="buy-item-name" placeholder="項目名稱" required class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-accent">
                 <input type="text" id="buy-item-note" placeholder="備註說明 (選填)" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-accent">
+                <input type="url" id="buy-item-link" placeholder="參考網址 (選填，例如貼文連結)" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-accent">
                 <input type="text" id="buy-item-pill" placeholder="分類小標籤 (例: 美妝)" required class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-bg/10 focus:outline-none focus:border-accent">
                 
                 <div>
@@ -621,6 +624,7 @@
         ];
         let expenseData = [];
         let prepData = [];
+        let tagColors = {};
         
         const defaultPrepList = [
             { category: "證件／重要資料", items: [
@@ -671,9 +675,11 @@
                 localStorage.setItem('seoul_shopping', JSON.stringify(shoppingData));
                 localStorage.setItem('seoul_prep', JSON.stringify(prepData));
                 localStorage.setItem('seoul_expense', JSON.stringify(expenseData));
+                localStorage.setItem('seoul_tagcolors', JSON.stringify(tagColors));
             } catch (error) {
                 console.error('儲存資料錯誤', error);
             }
+            pushStateToCloud();
         }
 
         function loadData() {
@@ -690,7 +696,8 @@
                 const b = localStorage.getItem('seoul_buy'); if (b) buyData = JSON.parse(b);
                 const s = localStorage.getItem('seoul_shopping'); if (s) shoppingData = JSON.parse(s);
                 const e = localStorage.getItem('seoul_expense'); if (e) expenseData = JSON.parse(e);
-                
+                const tc = localStorage.getItem('seoul_tagcolors'); if (tc) tagColors = JSON.parse(tc);
+
                 const p = localStorage.getItem('seoul_prep');
                 if (p) {
                     prepData = JSON.parse(p);
@@ -703,12 +710,47 @@
         }
 
         function resetAppData() {
-            showConfirm('確定要清除目前的資料，重新載入最新版本嗎？（已勾選、已手動修改過的內容會被清空）', () => {
-                ['seoul_trip', 'seoul_buy', 'seoul_shopping', 'seoul_prep', 'seoul_expense'].forEach(key => {
+            showConfirm('確定要清除本機暫存的資料嗎？（雲端上跟朋友共用的資料不會受影響，重新整理後會重新從雲端抓取最新內容）', () => {
+                ['seoul_trip', 'seoul_buy', 'seoul_shopping', 'seoul_prep', 'seoul_expense', 'seoul_tagcolors'].forEach(key => {
                     try { localStorage.removeItem(key); } catch (error) { console.error('清除資料錯誤', error); }
                 });
                 location.reload();
             });
+        }
+
+        // -------------------------
+        // 雲端同步 (Firebase Firestore)
+        // -------------------------
+        function pushStateToCloud() {
+            if (window.pushToCloud) {
+                window.pushToCloud({ tripData, buyData, shoppingData, expenseData, prepData, tagColors });
+            }
+        }
+
+        function applyCloudData(data) {
+            if (!data) {
+                // 雲端還沒有資料，把目前的內容當作初始版本推上去
+                pushStateToCloud();
+                return;
+            }
+            if (data.tripData) tripData = data.tripData;
+            if (data.buyData) buyData = data.buyData;
+            if (data.shoppingData) shoppingData = data.shoppingData;
+            if (data.expenseData) expenseData = data.expenseData;
+            if (data.prepData) prepData = data.prepData;
+            if (data.tagColors) tagColors = data.tagColors;
+
+            renderItinerary();
+            renderBuy();
+            renderShopping();
+            renderPrep();
+            renderExpense();
+        }
+
+        function initFirebaseSync() {
+            if (window.listenToCloud) {
+                window.listenToCloud(applyCloudData);
+            }
         }
 
         // -------------------------
@@ -813,20 +855,24 @@
         });
 
         function getPillStyle(text, customColor = null) {
-            let bg = customColor;
+            let bg = tagColors[text] || customColor;
             if (!bg) {
                 const t = text || '';
                 bg = 'bg-[#60A5FA]'; // 預設柔和藍色
-                
-                if (t.includes('美妝') || t.includes('保養')) bg = 'bg-[#A259BA]'; 
-                else if (t.includes('美食') || t.includes('吃') || t.includes('餐')) bg = 'bg-[#F26457]'; 
-            else if (t.includes('零食') || t.includes('伴手')) bg = 'bg-[#F4A261]'; // 橘色
-            else if (t.includes('文創') || t.includes('小物')) bg = 'bg-[#2A9D8F]'; // 湖水綠
-            else if (t.includes('現金')) bg = 'bg-[#E9C46A]'; // 黃色
-                else if (t.includes('現金')) bg = 'bg-[#E9C46A]'; 
-                else if (t.includes('刷卡')) bg = 'bg-[#457B9D]'; 
+
+                if (t.includes('美妝') || t.includes('保養')) bg = 'bg-[#A259BA]';
+                else if (t.includes('美食') || t.includes('吃') || t.includes('餐')) bg = 'bg-[#F26457]';
+                else if (t.includes('零食') || t.includes('伴手')) bg = 'bg-[#F4A261]'; // 橘色
+                else if (t.includes('文創') || t.includes('小物')) bg = 'bg-[#2A9D8F]'; // 湖水綠
+                else if (t.includes('現金')) bg = 'bg-[#E9C46A]'; // 黃色
+                else if (t.includes('刷卡')) bg = 'bg-[#457B9D]';
             }
             return `${bg} text-white px-1.5 py-0.5 rounded text-[10px] font-normal shadow-sm tracking-wider inline-block leading-none align-middle`;
+        }
+
+        function setTagColor(tag, color) {
+            if (!tag) return;
+            tagColors[tag] = color;
         }
 
         function openImageModal(imgSrc) {
@@ -936,6 +982,9 @@
                                         <button onclick="openMap('naver', '${item.addr}', '${item.name}')" class="bg-[#03C75A] text-white p-1 rounded hover:opacity-90 flex items-center justify-center shadow-sm" title="NAVER地圖">
                                             <svg class="w-3.5 h-3.5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
                                         </button>
+                                        ${item.link ? `<a href="${item.link}" target="_blank" class="bg-blue text-white p-1 rounded hover:opacity-90 flex items-center justify-center shadow-sm" title="參考網址">
+                                            <svg class="w-3.5 h-3.5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                        </a>` : ''}
                                     </div>
                                 </div>
 
@@ -979,6 +1028,7 @@
             document.getElementById('trip-time').value = '10:00';
             document.getElementById('trip-name').value = '';
             document.getElementById('trip-addr').value = '';
+            document.getElementById('trip-link').value = '';
             document.getElementById('trip-transport').value = '';
             document.getElementById('trip-modal').classList.remove('hidden');
             document.getElementById('trip-modal').classList.add('flex');
@@ -992,6 +1042,7 @@
             document.getElementById('trip-time').value = item.time;
             document.getElementById('trip-name').value = item.name;
             document.getElementById('trip-addr').value = item.addr;
+            document.getElementById('trip-link').value = item.link || '';
             document.getElementById('trip-transport').value = item.transport;
             document.getElementById('trip-modal').classList.remove('hidden');
             document.getElementById('trip-modal').classList.add('flex');
@@ -1009,16 +1060,17 @@
             const time = document.getElementById('trip-time').value.trim();
             const name = document.getElementById('trip-name').value.trim();
             const addr = document.getElementById('trip-addr').value.trim();
+            const link = document.getElementById('trip-link').value.trim();
             const transport = document.getElementById('trip-transport').value.trim();
 
             if (itemIdxVal === '') {
                 // Add
-                tripData[dayIndex].items.push({ time, name, addr, transport });
+                tripData[dayIndex].items.push({ time, name, addr, link, transport });
                 showToast('已新增行程');
             } else {
                 // Edit
                 const itemIndex = parseInt(itemIdxVal);
-                tripData[dayIndex].items[itemIndex] = { time, name, addr, transport };
+                tripData[dayIndex].items[itemIndex] = { time, name, addr, link, transport };
                 showToast('已更新行程');
             }
             
@@ -1060,6 +1112,7 @@
                             <p class="text-xs text-muted mt-0.5">${item.note}</p>
                         </div>
                         <div class="flex items-center space-x-1">
+                            ${item.link ? `<a href="${item.link}" target="_blank" class="p-1.5 text-blue hover:bg-blue/10 rounded transition" title="參考網址"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>` : ''}
                             <button onclick="addToShopping('${item.name}', '${item.note}')" class="p-1.5 text-blue hover:bg-blue/10 rounded transition" title="加入清單">
                                 <svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
                             </button>
@@ -1128,7 +1181,7 @@
             document.getElementById('region-name').value = r.region;
             document.getElementById('region-tag').value = r.tag;
             document.getElementById('region-desc').value = r.desc || '';
-            resetColorPicker('region-color', r.color);
+            resetColorPicker('region-color', tagColors[r.tag] || r.color);
             document.getElementById('region-modal').classList.remove('hidden');
             document.getElementById('region-modal').classList.add('flex');
         }
@@ -1145,19 +1198,20 @@
             const tag = document.getElementById('region-tag').value.trim() || '推薦';
             const desc = document.getElementById('region-desc').value.trim();
             const color = document.getElementById('region-color').value;
+            setTagColor(tag, color);
 
             if (idxVal === '') {
-                buyData.push({ region, tag, desc, color, items: [] });
+                buyData.push({ region, tag, desc, items: [] });
                 showToast('已新增推薦區域');
             } else {
                 buyData[parseInt(idxVal)].region = region;
                 buyData[parseInt(idxVal)].tag = tag;
                 buyData[parseInt(idxVal)].desc = desc;
-                buyData[parseInt(idxVal)].color = color;
                 showToast('已更新區域');
             }
             saveData();
             renderBuy();
+            renderExpense();
             closeRegionModal();
         }
 
@@ -1177,6 +1231,7 @@
             document.getElementById('buy-item-i-idx').value = '';
             document.getElementById('buy-item-name').value = '';
             document.getElementById('buy-item-note').value = '';
+            document.getElementById('buy-item-link').value = '';
             document.getElementById('buy-item-pill').value = '';
             resetColorPicker('buy-item-color');
             document.getElementById('buy-item-modal').classList.remove('hidden');
@@ -1190,20 +1245,9 @@
             document.getElementById('buy-item-i-idx').value = iIndex;
             document.getElementById('buy-item-name').value = item.name;
             document.getElementById('buy-item-note').value = item.note;
+            document.getElementById('buy-item-link').value = item.link || '';
             document.getElementById('buy-item-pill').value = item.pill;
-            resetColorPicker('buy-item-color', item.color);
-            document.getElementById('buy-item-modal').classList.remove('hidden');
-            document.getElementById('buy-item-modal').classList.add('flex');
-        }
-
-        function editBuyItem(rIndex, iIndex) {
-            const item = buyData[rIndex].items[iIndex];
-            document.getElementById('buy-item-modal-title').textContent = '編輯細項';
-            document.getElementById('buy-item-r-idx').value = rIndex;
-            document.getElementById('buy-item-i-idx').value = iIndex;
-            document.getElementById('buy-item-name').value = item.name;
-            document.getElementById('buy-item-note').value = item.note;
-            document.getElementById('buy-item-pill').value = item.pill;
+            resetColorPicker('buy-item-color', tagColors[item.pill] || item.color);
             document.getElementById('buy-item-modal').classList.remove('hidden');
             document.getElementById('buy-item-modal').classList.add('flex');
         }
@@ -1219,17 +1263,20 @@
             const iIdxVal = document.getElementById('buy-item-i-idx').value;
             const name = document.getElementById('buy-item-name').value.trim();
             const note = document.getElementById('buy-item-note').value.trim();
+            const link = document.getElementById('buy-item-link').value.trim();
             const pill = document.getElementById('buy-item-pill').value.trim() || '推薦';
             const color = document.getElementById('buy-item-color').value;
+            setTagColor(pill, color);
 
             if (iIdxVal === '') {
-                buyData[rIndex].items.push({ name, note, pill, color });
+                buyData[rIndex].items.push({ name, note, link, pill });
             } else {
                 const iIndex = parseInt(iIdxVal);
-                buyData[rIndex].items[iIndex] = { name, note, pill, color };
+                buyData[rIndex].items[iIndex] = { name, note, link, pill };
             }
             saveData();
             renderBuy();
+            renderExpense();
             closeBuyItemModal();
         }
 
@@ -1438,6 +1485,7 @@
                                     <span class="text-sm font-medium ${item.checked ? 'text-muted line-through' : 'text-ink'}">${item.name}</span>
                                 </label>
                                 <div class="flex items-center space-x-1 shrink-0">
+                                    ${item.link ? `<a href="${item.link}" target="_blank" class="text-muted hover:text-blue p-1 transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>` : ''}
                                     <button onclick="editPrepItem(${cIndex}, ${iIndex})" class="text-muted hover:text-blue p-1 transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
                                     <button onclick="deletePrepItem(${cIndex}, ${iIndex})" class="text-muted hover:text-accent p-1 transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                                 </div>
@@ -1479,9 +1527,11 @@
             if (isEdit) {
                 document.getElementById('prep-category').value = prepData[cIndex].category;
                 document.getElementById('prep-name').value = prepData[cIndex].items[iIndex].name;
+                document.getElementById('prep-link').value = prepData[cIndex].items[iIndex].link || '';
             } else {
                 document.getElementById('prep-category').value = '';
                 document.getElementById('prep-name').value = '';
+                document.getElementById('prep-link').value = '';
             }
             document.getElementById('prep-modal').classList.remove('hidden');
             document.getElementById('prep-modal').classList.add('flex');
@@ -1505,6 +1555,7 @@
             const nameInput = document.getElementById('prep-name');
             const category = categoryInput.value.trim() || '其他';
             const name = nameInput.value.trim();
+            const link = document.getElementById('prep-link').value.trim();
             if (!name) return;
 
             const editCVal = document.getElementById('prep-edit-c-index').value;
@@ -1521,9 +1572,9 @@
 
             let catObj = prepData.find(c => c.category === category);
             if (catObj) {
-                catObj.items.push({ name, checked });
+                catObj.items.push({ name, link, checked });
             } else {
-                prepData.push({ category, items: [{ name, checked }] });
+                prepData.push({ category, items: [{ name, link, checked }] });
             }
 
             saveData();
@@ -1789,7 +1840,42 @@
             
             loadWeather();
             loadExchangeRate();
+            initFirebaseSync();
         });
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCujDO4OIVwLr-LOCGTsAHksJJ9udKgbMY",
+            authDomain: "gogokorea-4dcfa.firebaseapp.com",
+            projectId: "gogokorea-4dcfa",
+            storageBucket: "gogokorea-4dcfa.firebasestorage.app",
+            messagingSenderId: "578001741585",
+            appId: "1:578001741585:web:d843220edf1c373a1f0eb0",
+            measurementId: "G-D7D6K1DBC3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const tripDocRef = doc(db, 'trips', 'gogokorea');
+
+        window.pushToCloud = function (state) {
+            setDoc(tripDocRef, state, { merge: true }).catch((error) => {
+                console.error('雲端同步失敗', error);
+                if (window.showToast) window.showToast('⚠️ 雲端同步失敗，請檢查網路');
+            });
+        };
+
+        window.listenToCloud = function (onData) {
+            onSnapshot(tripDocRef, (snap) => {
+                onData(snap.exists() ? snap.data() : null);
+            }, (error) => {
+                console.error('雲端連線錯誤', error);
+            });
+        };
     </script>
 </body>
 </html>
