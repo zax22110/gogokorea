@@ -1927,7 +1927,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCujDO4OIVwLr-LOCGTsAHksJJ9udKgbMY",
@@ -1940,7 +1940,12 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // 開啟本機持久化快取 (IndexedDB)：新增/編輯的內容會先寫進裝置本機的儲存佇列，
+        // 就算網路還沒送達伺服器前就被切掉分頁或關閉 App，資料也不會遺失，
+        // 下次打開時會自動繼續同步。
+        const db = initializeFirestore(app, {
+            localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
+        });
         const tripDocRef = doc(db, 'trips', 'gogokorea');
 
         window.pushToCloud = function (state) {
