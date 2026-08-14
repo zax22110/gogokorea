@@ -627,6 +627,8 @@
         let prepData = [];
         let tagColors = {};
         let collapsedRegions = new Set(); // 只影響本機顯示，不跟雲端同步
+        let collapsedDays = new Set(); // 只影響本機顯示，不跟雲端同步
+        let collapsedPrepCategories = new Set(); // 只影響本機顯示，不跟雲端同步
         
         const defaultPrepList = [
             { category: "證件／重要資料", items: [
@@ -711,6 +713,8 @@
             const e = readJSON('seoul_expense'); if (e) expenseData = e;
             const tc = readJSON('seoul_tagcolors'); if (tc) tagColors = tc;
             const cr = readJSON('seoul_buy_collapsed'); if (cr) collapsedRegions = new Set(cr);
+            const cd = readJSON('seoul_days_collapsed'); if (cd) collapsedDays = new Set(cd);
+            const cp = readJSON('seoul_prep_collapsed'); if (cp) collapsedPrepCategories = new Set(cp);
             const p = readJSON('seoul_prep'); if (p) prepData = p;
         }
 
@@ -921,6 +925,7 @@
             }
 
             tripData.forEach((dayGroup, dayIndex) => {
+                const isDayCollapsed = collapsedDays.has(dayIndex);
                 let itemsHtml = '';
 
                 dayGroup.items.forEach((item, itemIndex) => {
@@ -1008,15 +1013,18 @@
                 const dayHtml = `
                     <div class="custom-card bg-surface p-4 mb-8">
                         <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center space-x-2">
+                            <div class="flex items-center space-x-2 flex-1 cursor-pointer" onclick="toggleDay(${dayIndex})">
                                 <svg class="w-5 h-5 stroke-current text-accent" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 <h3 class="font-bold text-lg text-maroon">Day ${dayIndex + 1}</h3>
                             </div>
-                            <button onclick="addTrip(${dayIndex})" class="w-7 h-7 shrink-0 flex items-center justify-center rounded-full border-2 border-dashed border-maroon text-maroon hover:bg-maroon/5 transition" title="新增 Day ${dayIndex + 1} 行程">
-                                <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
-                            </button>
+                            <div class="flex items-center space-x-1 shrink-0 ml-2">
+                                <button onclick="addTrip(${dayIndex})" class="w-7 h-7 shrink-0 flex items-center justify-center rounded-full border-2 border-dashed border-maroon text-maroon hover:bg-maroon/5 transition" title="新增 Day ${dayIndex + 1} 行程">
+                                    <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                                </button>
+                                <button onclick="toggleDay(${dayIndex})" class="p-1 text-muted transform transition-transform ${isDayCollapsed ? 'rotate-180' : ''}"><svg class="w-5 h-5 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"></path></svg></button>
+                            </div>
                         </div>
-                        <div class="relative">
+                        <div class="relative ${isDayCollapsed ? 'hidden' : ''}">
                             <div class="absolute top-4 bottom-4 left-[11px] w-0 z-0" style="border-left: 2px dashed rgba(206,56,67,0.5);"></div>
                             <div class="day-sortable-list" data-day-index="${dayIndex}">
                                 ${itemsHtml}
@@ -1199,18 +1207,30 @@
             });
         }
 
-        function toggleRegion(regionName) {
-            if (collapsedRegions.has(regionName)) {
-                collapsedRegions.delete(regionName);
+        function toggleCollapse(set, key, storageKey, renderFn) {
+            if (set.has(key)) {
+                set.delete(key);
             } else {
-                collapsedRegions.add(regionName);
+                set.add(key);
             }
             try {
-                localStorage.setItem('seoul_buy_collapsed', JSON.stringify([...collapsedRegions]));
+                localStorage.setItem(storageKey, JSON.stringify([...set]));
             } catch (error) {
                 console.error('儲存收合狀態錯誤', error);
             }
-            renderBuy();
+            renderFn();
+        }
+
+        function toggleRegion(regionName) {
+            toggleCollapse(collapsedRegions, regionName, 'seoul_buy_collapsed', renderBuy);
+        }
+
+        function toggleDay(dayIndex) {
+            toggleCollapse(collapsedDays, dayIndex, 'seoul_days_collapsed', renderItinerary);
+        }
+
+        function togglePrepCategory(category) {
+            toggleCollapse(collapsedPrepCategories, category, 'seoul_prep_collapsed', renderPrep);
         }
 
         // 新增/編輯 推薦區域 (使用 Modal)
@@ -1519,13 +1539,16 @@
                 container.innerHTML = `<div class="text-center text-xs font-bold text-muted py-4">目前沒有行前準備項目，快新增吧！</div>`;
                 return;
             }
-            container.innerHTML = prepData.map((cat, cIndex) => `
+            container.innerHTML = prepData.map((cat, cIndex) => {
+                const isCatCollapsed = collapsedPrepCategories.has(cat.category);
+                return `
                 <div class="custom-card bg-surface overflow-hidden border-orange">
                     <div class="bg-orange/5 px-3 py-2 flex items-center justify-between border-b border-orange/10">
-                        <h4 class="font-bold text-sm text-orange">${cat.category}</h4>
+                        <h4 class="font-bold text-sm text-orange flex-1 cursor-pointer" onclick="togglePrepCategory('${cat.category}')">${cat.category}</h4>
                         <button onclick="deletePrepCategory(${cIndex})" class="p-1 text-muted hover:text-accent transition"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                        <button onclick="togglePrepCategory('${cat.category}')" class="p-1 text-muted transform transition-transform ${isCatCollapsed ? 'rotate-180' : ''}"><svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"></path></svg></button>
                     </div>
-                    <div class="p-2 space-y-1">
+                    <div class="p-2 space-y-1 ${isCatCollapsed ? 'hidden' : ''}">
                         ${cat.items.map((item, iIndex) => `
                             <div class="flex items-center justify-between p-2 hover:bg-bg/50 rounded transition group">
                                 <label class="flex items-center cursor-pointer flex-1">
@@ -1544,7 +1567,8 @@
                         `).join('')}
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function togglePrepCheck(cIndex, iIndex) {
