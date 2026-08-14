@@ -678,7 +678,6 @@
                 localStorage.setItem('seoul_buy', JSON.stringify(buyData));
                 localStorage.setItem('seoul_shopping', JSON.stringify(shoppingData));
                 localStorage.setItem('seoul_prep', JSON.stringify(prepData));
-                localStorage.setItem('seoul_expense', JSON.stringify(expenseData));
                 localStorage.setItem('seoul_tagcolors', JSON.stringify(tagColors));
             } catch (error) {
                 console.error('儲存資料錯誤', error);
@@ -710,7 +709,6 @@
             }
             const b = readJSON('seoul_buy'); if (b) buyData = b;
             const s = readJSON('seoul_shopping'); if (s) shoppingData = s;
-            const e = readJSON('seoul_expense'); if (e) expenseData = e;
             const tc = readJSON('seoul_tagcolors'); if (tc) tagColors = tc;
             const cr = readJSON('seoul_buy_collapsed'); if (cr) collapsedRegions = new Set(cr);
             const cd = readJSON('seoul_days_collapsed'); if (cd) collapsedDays = new Set(cd);
@@ -720,7 +718,7 @@
 
         function resetAppData() {
             showConfirm('確定要清除本機暫存的資料嗎？（雲端上跟朋友共用的資料不會受影響，重新整理後會重新從雲端抓取最新內容）', () => {
-                ['seoul_trip', 'seoul_buy', 'seoul_shopping', 'seoul_prep', 'seoul_expense', 'seoul_tagcolors'].forEach(key => {
+                ['seoul_trip', 'seoul_buy', 'seoul_shopping', 'seoul_prep', 'seoul_tagcolors'].forEach(key => {
                     try { localStorage.removeItem(key); } catch (error) { console.error('清除資料錯誤', error); }
                 });
                 location.reload();
@@ -732,7 +730,7 @@
         // -------------------------
         function pushStateToCloud(fields = null) {
             if (!window.pushToCloud) return;
-            const allData = { tripData, buyData, shoppingData, expenseData, prepData, tagColors };
+            const allData = { tripData, buyData, shoppingData, prepData, tagColors };
             if (!fields) {
                 window.pushToCloud(allData);
             } else {
@@ -751,7 +749,6 @@
             if (data.tripData) tripData = data.tripData;
             if (data.buyData) buyData = data.buyData;
             if (data.shoppingData) shoppingData = data.shoppingData;
-            if (data.expenseData) expenseData = data.expenseData;
             if (data.prepData) prepData = data.prepData;
             if (data.tagColors) tagColors = data.tagColors;
 
@@ -759,12 +756,19 @@
             renderBuy();
             renderShopping();
             renderPrep();
+        }
+
+        function applyCloudExpenses(items) {
+            expenseData = items;
             renderExpense();
         }
 
         function initFirebaseSync() {
             if (window.listenToCloud) {
                 window.listenToCloud(applyCloudData);
+            }
+            if (window.listenExpensesCloud) {
+                window.listenExpensesCloud(applyCloudExpenses);
             }
         }
 
@@ -1777,16 +1781,16 @@
             if (!amount || !note) return;
 
             const finalizeExpense = (imgSrc) => {
+                const data = { currency, method, category, amount, note, imgSrc };
                 if (editIndexVal === '') {
-                    expenseData.unshift({ id: Date.now(), currency, method, category, amount, note, imgSrc });
+                    if (window.addExpenseCloud) window.addExpenseCloud(data);
                     showToast('已記下一筆花費');
                 } else {
                     const idx = parseInt(editIndexVal);
-                    expenseData[idx] = { ...expenseData[idx], currency, method, category, amount, note, imgSrc };
+                    const id = expenseData[idx] && expenseData[idx].id;
+                    if (id && window.updateExpenseCloud) window.updateExpenseCloud(id, data);
                     showToast('已更新花費');
                 }
-                saveData(['expenseData']);
-                renderExpense();
                 closeExpenseModal();
             };
 
@@ -1802,9 +1806,8 @@
 
         function deleteExpense(index) {
             showConfirm('確定要刪除這筆花費嗎？', () => {
-                expenseData.splice(index, 1);
-                saveData(['expenseData']);
-                renderExpense();
+                const id = expenseData[index] && expenseData[index].id;
+                if (id && window.deleteExpenseCloud) window.deleteExpenseCloud(id);
                 showToast('已刪除花費');
             });
         }
@@ -1927,7 +1930,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, doc, setDoc, onSnapshot, collection, addDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCujDO4OIVwLr-LOCGTsAHksJJ9udKgbMY",
@@ -1947,6 +1950,9 @@
             localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })
         });
         const tripDocRef = doc(db, 'trips', 'gogokorea');
+        // 記帳改用獨立的子集合 (每一筆花費是自己的文件)，而不是塞在同一個陣列欄位裡，
+        // 這樣兩人同時各記一筆帳不會互相蓋掉對方，各自新增各自的文件即可。
+        const expensesColRef = collection(db, 'trips', 'gogokorea', 'expenses');
 
         window.pushToCloud = function (state) {
             setDoc(tripDocRef, state, { merge: true }).catch((error) => {
@@ -1960,6 +1966,36 @@
                 onData(snap.exists() ? snap.data() : null);
             }, (error) => {
                 console.error('雲端連線錯誤', error);
+            });
+        };
+
+        window.addExpenseCloud = function (data) {
+            addDoc(expensesColRef, { ...data, createdAt: serverTimestamp() }).catch((error) => {
+                console.error('新增花費同步失敗', error);
+                if (window.showToast) window.showToast('⚠️ 花費同步失敗，請檢查網路');
+            });
+        };
+
+        window.updateExpenseCloud = function (id, data) {
+            updateDoc(doc(expensesColRef, id), data).catch((error) => {
+                console.error('更新花費同步失敗', error);
+                if (window.showToast) window.showToast('⚠️ 花費同步失敗，請檢查網路');
+            });
+        };
+
+        window.deleteExpenseCloud = function (id) {
+            deleteDoc(doc(expensesColRef, id)).catch((error) => {
+                console.error('刪除花費同步失敗', error);
+                if (window.showToast) window.showToast('⚠️ 花費同步失敗，請檢查網路');
+            });
+        };
+
+        window.listenExpensesCloud = function (onData) {
+            const q = query(expensesColRef, orderBy('createdAt', 'desc'));
+            onSnapshot(q, (snap) => {
+                onData(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+            }, (error) => {
+                console.error('花費雲端連線錯誤', error);
             });
         };
     </script>
