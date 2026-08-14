@@ -672,7 +672,7 @@
             ]}
         ];
 
-        function saveData() {
+        function saveData(fields = null) {
             try {
                 localStorage.setItem('seoul_trip', JSON.stringify(tripData));
                 localStorage.setItem('seoul_buy', JSON.stringify(buyData));
@@ -683,7 +683,7 @@
             } catch (error) {
                 console.error('儲存資料錯誤', error);
             }
-            pushStateToCloud();
+            pushStateToCloud(fields);
         }
 
         function loadData() {
@@ -730,9 +730,15 @@
         // -------------------------
         // 雲端同步 (Firebase Firestore)
         // -------------------------
-        function pushStateToCloud() {
-            if (window.pushToCloud) {
-                window.pushToCloud({ tripData, buyData, shoppingData, expenseData, prepData, tagColors });
+        function pushStateToCloud(fields = null) {
+            if (!window.pushToCloud) return;
+            const allData = { tripData, buyData, shoppingData, expenseData, prepData, tagColors };
+            if (!fields) {
+                window.pushToCloud(allData);
+            } else {
+                const partial = {};
+                fields.forEach(f => { partial[f] = allData[f]; });
+                window.pushToCloud(partial);
             }
         }
 
@@ -1072,7 +1078,7 @@
             });
 
             tripData = newTripData;
-            saveData();
+            saveData(['tripData']);
             renderItinerary();
         }
 
@@ -1131,7 +1137,7 @@
             }
             
             tripData[dayIndex].items.sort((a, b) => a.time.localeCompare(b.time));
-            saveData();
+            saveData(['tripData']);
             renderItinerary();
             closeTripModal();
         }
@@ -1144,7 +1150,7 @@
                 });
 
                 tripData[dayIndex].items.splice(itemIndex, 1);
-                saveData();
+                saveData(['tripData', 'shoppingData']);
                 renderItinerary();
                 renderShopping();
                 showToast('已刪除行程');
@@ -1280,7 +1286,7 @@
                 buyData[parseInt(idxVal)].desc = desc;
                 showToast('已更新區域');
             }
-            saveData();
+            saveData(['buyData', 'tagColors']);
             renderBuy();
             renderExpense();
             closeRegionModal();
@@ -1289,7 +1295,7 @@
         function deleteBuyRegion(index) {
             showConfirm('確定要刪除整個區域與裡面的項目嗎？', () => {
                 buyData.splice(index, 1);
-                saveData();
+                saveData(['buyData']);
                 renderBuy();
                 showToast('已刪除區域');
             });
@@ -1345,7 +1351,7 @@
                 const iIndex = parseInt(iIdxVal);
                 buyData[rIndex].items[iIndex] = { name, note, link, pill };
             }
-            saveData();
+            saveData(['buyData', 'tagColors']);
             renderBuy();
             renderExpense();
             closeBuyItemModal();
@@ -1354,7 +1360,7 @@
         function deleteBuyItem(rIndex, iIndex) {
             showConfirm('確定刪除此項目？', () => {
                 buyData[rIndex].items.splice(iIndex, 1);
-                saveData();
+                saveData(['buyData']);
                 renderBuy();
             });
         }
@@ -1370,7 +1376,7 @@
                 checked: false,
                 locationId: ''
             });
-            saveData();
+            saveData(['shoppingData']);
             renderShopping();
             renderItinerary();
             showToast('✅ 已加入購物清單！');
@@ -1434,7 +1440,7 @@
 
         function toggleShopping(index) {
             shoppingData[index].checked = !shoppingData[index].checked;
-            saveData();
+            saveData(['shoppingData']);
             renderShopping();
             renderItinerary();
         }
@@ -1442,7 +1448,7 @@
         function deleteShopping(index) {
             showConfirm('確定要刪除這個商品嗎？', () => {
                 shoppingData.splice(index, 1);
-                saveData();
+                saveData(['shoppingData']);
                 renderShopping();
                 renderItinerary();
                 showToast('已刪除商品');
@@ -1514,7 +1520,7 @@
                     shoppingData[idx] = { ...shoppingData[idx], name, qty, note, link, locationId, imgSrc };
                     showToast('已更新商品');
                 }
-                saveData();
+                saveData(['shoppingData']);
                 renderShopping();
                 renderItinerary();
                 closeShoppingModal();
@@ -1573,21 +1579,21 @@
 
         function togglePrepCheck(cIndex, iIndex) {
             prepData[cIndex].items[iIndex].checked = !prepData[cIndex].items[iIndex].checked;
-            saveData();
+            saveData(['prepData']);
             renderPrep();
         }
 
         function deletePrepItem(cIndex, iIndex) {
             prepData[cIndex].items.splice(iIndex, 1);
             if (prepData[cIndex].items.length === 0) prepData.splice(cIndex, 1);
-            saveData();
+            saveData(['prepData']);
             renderPrep();
         }
 
         function deletePrepCategory(cIndex) {
             showConfirm('確定刪除這個類別及裡面所有項目？', () => {
                 prepData.splice(cIndex, 1);
-                saveData();
+                saveData(['prepData']);
                 renderPrep();
             });
         }
@@ -1652,7 +1658,7 @@
                 prepData.push({ category, items: [{ name, link, checked }] });
             }
 
-            saveData();
+            saveData(['prepData']);
             renderPrep();
 
             showToast(editCVal !== '' ? '已更新準備項目' : '已新增準備項目');
@@ -1779,7 +1785,7 @@
                     expenseData[idx] = { ...expenseData[idx], currency, method, category, amount, note, imgSrc };
                     showToast('已更新花費');
                 }
-                saveData();
+                saveData(['expenseData']);
                 renderExpense();
                 closeExpenseModal();
             };
@@ -1797,7 +1803,7 @@
         function deleteExpense(index) {
             showConfirm('確定要刪除這筆花費嗎？', () => {
                 expenseData.splice(index, 1);
-                saveData();
+                saveData(['expenseData']);
                 renderExpense();
                 showToast('已刪除花費');
             });
